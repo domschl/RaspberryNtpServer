@@ -82,7 +82,7 @@ If reception is ok, a led ("FIX" or "PPS") should start blinking on your GPS mod
 
 ### More information
 
-* Adafruit has an execellent [GPS guide](https://learn.adafruit.com/adafruit-ultimate-gps) for their ultimate GPS module.
+* Adafruit has an excellent [GPS guide](https://learn.adafruit.com/adafruit-ultimate-gps) for their ultimate GPS module.
 
 ## Software
 
