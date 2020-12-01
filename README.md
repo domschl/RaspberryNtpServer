@@ -16,7 +16,7 @@ is Raspberry Pi 4, due to 1Gbit network interface and fast hardware for lowest p
   * GSP module with USB, SMA connector and PPS: [Keystudio GPS module](https://wiki.keyestudio.com/KS0319_keyestudio_GPS_Module)
   * Cheap NEO6 modules: [Aliexpress NEO6](https://www.aliexpress.com/item/32800500501.html?spm=a2g0o.productlist.0.0.2eae3298PesRP8&algo_pvid=89486c29-bfb7-414c-a88d-81a9972f8080&algo_expid=89486c29-bfb7-414c-a88d-81a9972f8080-1&btsid=2100bdd516068129046292696e617f&ws_ab_test=searchweb0_0,searchweb201602_,searchweb201603_)
 
-  <img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/antenna.jpg" align="right" width="200" height="200" />
+<img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/antenna.jpg" align="right" width="200" height="200" />
   
 * Active GPS antenna
 
@@ -35,9 +35,11 @@ Some boards have uFL antenna connectors, whereas almost all external active ante
 
 Some GPS modules come with a passive antenna and and external antenna plug. Check the description of your board to find out what's needed to use the external antenna. The Keystudio GPS module listed above for example, requires the removal of capacitor C2 in order to activate the external antenna.
 
+<img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/gps-with-pps.jpg" align="right" width="300" height="300" />
+
 #### PPS signal easily accessible?
 
-Make sure your GPS module has an accessible output for the PPS signal.
+Make sure your GPS module has an accessible output for the PPS signal. (Red mark on image)
 
 If you are using a GPS Hat that plugs into the Raspberry IO connector, check the documentation to which GPIO pin the PPS signal is connected. Adafruit's Hat uses GPIO 4.
 
