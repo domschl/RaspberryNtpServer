@@ -66,6 +66,12 @@ Serial connection:
 
 NEO6 GPS modules are available at very low cost (1-2Eur) at chinese dealers (Aliexpress) and are perfectly usable as long as they allow connecting an active external GPS antenna and provide a PPS signal.
 
+<img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/gps-wiring.png" width="600" height="400" />
+
+_Typical wiring between GPS module and Raspberry Pi connector._
+
+Note: If your GPS module is connected via USB, you only need to connect the PPS connector on the GPS module to GPIO 4 on the Raspberry. Power (Vin), Gnd and Tx/Rx are handled via USB.
+
 ## Software
 
 * Raspberry Linux preparations
