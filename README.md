@@ -233,6 +233,8 @@ sudo systemctl enable chronyd
 sudo systemctl start chronyd
 ```
 
+Verify that `chrony` started ok with `sudo systemctl status chronyd`. One possible error is a fatal message that `chronyd has been compiled without PPS support`. If that's the case (e.g. Manjaro 64bit), you either need to [compile chrony yourself](https://chrony.tuxfamily.org/doc/2.4/installation.html), or switch to another disti.
+
 Then start the chrony console with `chronyc`. At the `chronyc>` prompt, enter:
 
 `sources`:
