@@ -164,6 +164,46 @@ Now use `cgps` or `gpsmon` to make sure that you are receiving GPS information a
 
 ## Setting up PPS
 
+The serial or USB connection to the GPS module alone does not allow precise time synchronisation. The slow communication has latencies somewhere between 50ms to 200ms, much too high latency for precision time servers.
+
+This is compensated by the PPS signal that is directly connected to Raspberry PI's GPIO 4 (you can use other GPIO pins, simply adapt this correpondingly below).
+
+We need to enable a special kernel driver and overlay in order to receive this once-per-second GPS synchronised pulse is precisely as possible.
+
+1. Edit `/boot/cmdline.txt` and add ` bcm2708.pps_gpio_pin=4` at the end of the line.
+2. Edit `/boot/config.txt` and add a line `dtoverlay=pps-gpio,gpiopin=4`. (Depending on your distri, either 1. or 2. is necessary, but it doesn't seem to hurt to do both).
+3. Edit `/etc/modules-load.d/raspberrypi.conf` and add two lines with `pps-gpio` and `pps-ldisc`, to load the required kernel modules
+
+After a reboot, a new device `/dev/pps0` should exist, and `dmesg` should show something like:
+
+```
+[    7.528565] pps_core: LinuxPPS API ver. 1 registered
+[    7.530144] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+[    7.540372] pps pps0: new PPS source pps@4.-1
+[    7.542012] pps pps0: Registered IRQ 166 as PPS source
+[    7.550775] pps_ldisc: PPS line discipline registered
+```
+
+Now use `ppstest` (you might need to install `pps-utils`):
+
+`sudo ppstest /dev/pps0`
+
+You should see an output like:
+
+```
+trying PPS source "/dev/pps0"
+found PPS source "/dev/pps0"
+ok, found 1 source(s), now start fetching data...
+source 0 - assert 1606833766.999998552, sequence: 341090 - clear  0.000000000, sequence: 0
+source 0 - assert 1606833767.999998573, sequence: 341091 - clear  0.000000000, sequence: 0
+source 0 - assert 1606833768.999998751, sequence: 341092 - clear  0.000000000, sequence: 0
+```
+
+`assert` and `sequence` should both increment by 1 for each line.
+
+Once you receive a PPS signal and GPSD is configured, continue.
+
+
 ## Setting up Chrony as time-server
 
 * https://chrony.tuxfamily.org/faq.html#_using_a_pps_reference_clock
