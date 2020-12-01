@@ -251,7 +251,7 @@ MS Name/IP address         Stratum Poll Reach LastRx Last sample
 chronyc> 
 ```
 
-If all went well, you should see a `PPS` device marked with `#*`, indicating the active time source. Error should be in nanosecond range (`-138ns[ -108ns] +/-  120ns`). `#?` indicates an unusable time source, `^-` a usuable but unused source.
+If all went well, you should see a `PPS` device marked with `#*`, indicating the active time source. Error should be in nanosecond range (`-138ns[ -108ns] +/-  120ns`). `#?` indicates an unusable time source, `^-` a usable but unused source.
 
 ### Synchronizing the offset between serial time information and PPS
 
@@ -312,7 +312,7 @@ Update interval : 16.0 seconds
 Leap status     : Normal
 ```
 
-* For more information, check the [chrony documentation](https://chrony.tuxfamily.org/faq.html#_using_a_pps_reference_clock)
+* For more information, check the [chrony PPS documentation](https://chrony.tuxfamily.org/faq.html#_using_a_pps_reference_clock)
 
 ### Making you new precision time server available on the network
 
