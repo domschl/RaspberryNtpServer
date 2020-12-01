@@ -314,6 +314,28 @@ Leap status     : Normal
 
 * For more information, check the [chrony documentation](https://chrony.tuxfamily.org/faq.html#_using_a_pps_reference_clock)
 
+### Making you new precision time server available on the network
+
+By default, chrony allows only local access, use `allow` in `/etc/chrony.conf` to allow access in your local network, e.g.:
+
+```
+allow 192.168/16
+```
+
+To be able to administer the chrony time server over the net, add:
+
+```
+cmdallow 192.168/16
+```
+
+#### Further optimizations in `chrony.conf`
+
+* `lock_all` to make sure chrony is always in memory.
+* `local stratum 1` to signal precision time.
+
+For more, check the [official chrony documenation](https://chrony.tuxfamily.org/doc/4.0/chrony.conf.html)
+
+
 ## Accessing GPS and time information with python
 
 T.B.D.
