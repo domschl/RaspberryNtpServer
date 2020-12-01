@@ -88,7 +88,7 @@ If reception is ok, a led ("FIX" or "PPS") should start blinking on your GPS mod
 
 ### Raspberry Linux preparations
 
-#### Serial port console
+#### Serial port console (skip, if connected via USB)
 
 If your GPS board is connected via serial connection (Rx/Tx), you need to "free up" Raspberry's serial port, which by default is used to connect a serial (debug) console. We need to disable that console to prevent it from interferring with the GPS module. 
 
@@ -105,7 +105,7 @@ How to disable the serial console on Raspberry variies greatly depending on hard
 5. At the prompt Would you like the serial port hardware to be enabled? answer 'Yes'
 6. Exit raspi-config and reboot the Pi for changes to take effect.
 
-See [Source](https://www.raspberrypi.org/documentation/configuration/uart.md#:~:text=Disable%20Linux%20serial%20console&text=This%20can%20be%20done%20by,Select%20option%20P6%20%2D%20Serial%20Port) at raspberrypi.org.
+See ["Disable Linux serial console"](https://www.raspberrypi.org/documentation/configuration/uart.md#:~:text=Disable%20Linux%20serial%20console&text=This%20can%20be%20done%20by,Select%20option%20P6%20%2D%20Serial%20Port) at raspberrypi.org.
 
 Older versions of `raspi-config` hide the same serial options under "Advanced options"
 
@@ -114,26 +114,53 @@ Older versions of `raspi-config` hide the same serial options under "Advanced op
 1. Edit `/boot/cmdline.txt` and remove references to the serial port `ttyAMA0`. E.g. remove: `console=ttyAMA0,115200` and (if present) `kgdboc=ttyAMA0,115200`.
 2. Disable getty on serial port. `sudo systemctl disable getty@ttyAMA0` or, on some Linux distris: `sudo systemctl disable serial-getty@ttyAMA0`
 3. Enable uart in `/boot/config.txt`, add a line `enable_uart=1`
-4. For RPI 3 or later disable bluetooth via overlay, add another line to `/boot/config.txt`: `dtoverlay=pi3-disable-bt-overlay`
+4. For RPI 3 or later disable bluetooth via overlay, add another line to `/boot/config.txt`: `dtoverlay=pi3-disable-bt-overlay`. In some versions, this is done by *enabling* the overlay `dtoverlay=pi3-miniuart-bt` which disables bluetooth and reestablishes standard serial.
 
+See: ["Raspberry Pi 3, 4 and Zero W Serial Port Usage"](https://www.abelectronics.co.uk/kb/article/1035/raspberry-pi-3-serial-port-usage).  
 
-  
-See also: [this reference for RPI 3, 4 and zero](https://www.abelectronics.co.uk/kb/article/1035/raspberry-pi-3-serial-port-usage).  
-  
-  
-  
-  
-  
-  * pps kernel drivers and gpio
-  
-* gspd tests
-* pps tests
+#### Test serial / USB output of GPS
 
-  * pps-utils
-  
-* chrony
+Do a `cat` on your serial port (e.g. `cat /dev/ttyS0`), or, for USB `cat /dev/ttyACM0` or `cat /dev/ttyUSB0`, and you should receive an output like:
 
-## Setting up GPS
+```
+$GPGGA,1413247.000,48432.1655,N,01342323.7322,E,1,06,1.340,2505.5,M,347.6,M,,*69
+$GPGSA,A,3,123,303,248,205,037,415,,,,,,,1.59,1.340,0.90*049
+```
+
+## Setting up GPSD
+
+Once you successfully receive output from your GPS module, next step is to install `gpsd` via your packet manager.
+
+Edit `/etc/default/gpsd`:
+
+For serial connections (use your device name as tested above):
+
+```
+START_DAEMON="true"
+GPSD_OPTIONS="-n -G"
+DEVICES="/dev/ttyS0"
+USBAUTO="false"
+```
+
+For USB connections (again use your actual device name):
+
+```
+START_DAEMON="true"
+GPSD_OPTIONS="-n"
+DEVICES="/dev/ttyACM0"
+USBAUTO="true"
+```
+
+Enable and start `gpsd` with:
+
+```
+sudo systemctl enable gpsd
+sudo systemctl start gpsd
+```
+
+Now use `cgps` or `gpsmon` to make sure that you are receiving GPS information and time.
+
+`cgps` should display `Status: 3D fix (xx secs)`. Do not continue until you have a stable GPS fix.
 
 ## Setting up PPS
 
