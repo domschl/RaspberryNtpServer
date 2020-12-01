@@ -1,6 +1,6 @@
 # RaspberryNtpServer
 
-Stratum-1 NTP time server with Raspberry Pi, GPS and Chrony
+Stratum-1 NTP time server with Raspberry Pi, GPS and Chrony: how to build a precision time server.
 
 ## Requirements - Hardware
 
@@ -335,7 +335,3 @@ cmdallow 192.168/16
 
 For more, check the [official chrony documenation](https://chrony.tuxfamily.org/doc/4.0/chrony.conf.html)
 
-
-## Accessing GPS and time information with python
-
-T.B.D.
