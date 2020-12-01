@@ -168,7 +168,7 @@ The serial or USB connection to the GPS module alone does not allow precise time
 
 This is compensated by the PPS signal that is directly connected to Raspberry PI's GPIO 4 (you can use other GPIO pins, simply adapt this correpondingly below).
 
-We need to enable a special kernel driver and overlay in order to receive this once-per-second GPS synchronised pulse is precisely as possible.
+We need to enable a special kernel driver and overlay in order to receive this once-per-second GPS synchronised pulse as precisely as possible.
 
 1. Edit `/boot/cmdline.txt` and add ` bcm2708.pps_gpio_pin=4` at the end of the line.
 2. Edit `/boot/config.txt` and add a line `dtoverlay=pps-gpio,gpiopin=4`. (Depending on your distri, either 1. or 2. is necessary, but it doesn't seem to hurt to do both).
@@ -206,12 +206,114 @@ Once you receive a PPS signal and GPSD is configured, continue.
 
 ## Setting up Chrony as time-server
 
-* https://chrony.tuxfamily.org/faq.html#_using_a_pps_reference_clock
+**Note:** Before you setup `chrony`, make sure you completed `gpsd` configuration and that `gpsd` is running ok, and that you have a valid PPS signal at `/dev/pps0`.
 
-### Tuning GPS delay
+Install `chrony`, an alternative NTP server that in my experience results in higher precision time servers than good old ntpd.
 
+Make sure that no other time server (`ntdp`, `systemd-timedated`) is active, e.g.
 
-## Testing and trouble shooting
+```
+sudo systemctl disable systemd-timedated
+sudo systemctl stop systemd-timedated
+```
+
+Edit `/etc/chrony.conf`, and add two lines:
+
+```
+refclock PPS /dev/pps0 lock GPS
+refclock SHM 0 refid GPS precision 1e-1 offset 0.0 delay 0.2 noselect
+```
+
+This uses a shared memory device `SHM` to get unprecise time information from GPSD (low precision, marked as `noselect`, so that chrony doesn't try to sync to serial time data). This unprecise time information is then synchronised with the much more precise PPS signal.
+
+Now enable and start `chrony`:
+
+```
+sudo systemctl enable chronyd
+sudo systemctl start chronyd
+```
+
+Then start the chrony console with `chronyc`. At the `chronyc>` prompt, enter:
+
+`sources`:
+
+```
+chronyc> sources
+210 Number of sources = 6
+MS Name/IP address         Stratum Poll Reach LastRx Last sample               
+===============================================================================
+#* PPS0                          0   4   377    13   -138ns[ -108ns] +/-  120ns
+#? GPS                           0   4   377    13  -4624us[-4624us] +/- 2148us
+^- sismox.com                    3  10   377    15   -179us[ -179us] +/-   81ms
+^- ntp.fra.de.as206479.net       2  10   377   749  +4235us[+4238us] +/-   16ms
+^- mail.trexler.at               2  10   377  1114  +1190us[+1193us] +/-   13ms
+^- ntp2.hetzner.de               2  10   377    59   -411us[ -411us] +/-   32ms
+chronyc> 
+```
+
+If all went well, you should see a `PPS` device marked with `#*`, indicating the active time source. Error should be in nanosecond range (`-138ns[ -108ns] +/-  120ns`). `#?` indicates an unusable time source, `^-` a usuable but unused source.
+
+### Synchronizing the offset between serial time information and PPS
+
+The PPS signal is only used, if the divergence between the slow serial/USB time information and the precise PPS signal is less than 200ms. If your PPS device stays on `#?` (unusable), and you are sure that gpsd is receiving valid GPS signals and `ppstest` shows a correct PPS signal, then we need to tune the offset between serial time information and PPS. 
+
+In `chronyc`, enter `sourcestats`
+
+```
+chronyc> sourcestats
+210 Number of sources = 9
+Name/IP Address            NP  NR  Span  Frequency  Freq Skew  Offset  Std Dev
+==============================================================================
+...
+GPS                        40  22   626     -4.310      9.467    512ms  2474us
+...
+```
+
+the important field is `offset` of `GPS`: if that is larger 200ms, PPS cannot sync to GPS.
+
+Wait a few minutes for the offset to stabilize, note it's value, and edit `/etc/chrony.conf`, and change the offset in the second line with the value above, converted to seconds (512ms are 0.512 sec in this case):
+
+```
+refclock PPS /dev/pps0 lock GPS
+refclock SHM 0 refid GPS precision 1e-1 offset 0.512 delay 0.2 noselect
+```
+
+Restart `chrony` with `sudo systemctl restart chronyd`, and check `chronyc` again:
+
+After some time the output of `sourcestats` should show a much better offset for GPS:
+
+```
+chronyc> sourcestats
+210 Number of sources = 9
+Name/IP Address            NP  NR  Span  Frequency  Freq Skew  Offset  Std Dev
+==============================================================================
+PPS0                       12   5   179     +0.000      0.003     +1ns   102ns
+GPS                        40  22   626     -4.310      9.467  -8600us  2474us
+```
+
+and `sources` should now show PPS as active, marked with `#*`.
+
+Use `chronyc` and command `tracking` to get information about the precision of your new time server:
+
+```
+chronyc> tracking
+Reference ID    : 50505330 (PPS0)
+Stratum         : 1
+Ref time (UTC)  : Tue Dec 01 15:17:22 2020
+System time     : 0.000000032 seconds slow of NTP time
+Last offset     : -0.000000059 seconds
+RMS offset      : 0.000000103 seconds
+Frequency       : 2.167 ppm fast
+Residual freq   : -0.000 ppm
+Skew            : 0.005 ppm
+Root delay      : 0.000000001 seconds
+Root dispersion : 0.000025110 seconds
+Update interval : 16.0 seconds
+Leap status     : Normal
+```
+
+* For more information, check the [chrony documentation](https://chrony.tuxfamily.org/faq.html#_using_a_pps_reference_clock)
 
 ## Accessing GPS and time information with python
 
+T.B.D.
