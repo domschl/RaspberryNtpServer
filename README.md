@@ -1,6 +1,6 @@
 # RaspberryNtpServer
 
-Stratum 1 NTP time server with Raspberry Pi, GPS and Chrony
+Stratum-1 NTP time server with Raspberry Pi, GPS and Chrony
 
 ## Requirements - Hardware
 
@@ -29,10 +29,29 @@ Some boards have uFL antenna connectors, whereas almost all external active ante
 
 ### Problems
 
-* Is external antenna selected?
-* PPS signal easily accessible?
-* USB vs serial
-* GSP antenna shielding
+#### Is external antenna selected?
+
+Some GPS modules come with a passive antenna and and external antenna plug. Check the description of your board to find out what's needed to use the external antenna. The Keystudio GPS module listed above for example, requires the removal of capacitor C2 in order to activate the external antenna.
+
+#### PPS signal easily accessible?
+
+Make sure your GPS module has an accessible output for the PPS signal.
+
+If you are using a GPS Hat that plugs into the Raspberry IO connector, check the documentation to which GPIO pin the PPS signal is connected. Adafruit's Hat uses GPIO 4.
+
+#### USB vs serial
+
+When not using a Pi Hat, decide between USB- and serial connection.
+
+USB-Connection:
+* No extra cables for Vcc, GND, Tx, Rx are needed: both powersupply and communication goes over USB.
+* No modification of Raspberry's serial console is needed, easier software installation
+
+Serial connection:
+* Usually cheaper, if a module is purchased.
+* All Pi Hats use serial connections.
+* Raspberry serial console needs to be disabled
+* Sometimes, bluetooth needs to be disabled.
 
 ### Recommended setup
 
