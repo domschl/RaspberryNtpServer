@@ -23,7 +23,9 @@ When selecting a GPS antenna, make sure to get an active antenna with 3-5V power
 ### Antenna adapters
 
 Some boards have uFL antenna connectors, whereas almost all external active antennas use SMA, so you might need an uFL to SMA adapter:
-* https://www.adafruit.com/product/851
+
+* [Adafruit uFL to SMA adapter](https://www.adafruit.com/product/851)
+* [Various uFL to SMA adapters](https://www.aliexpress.com/item/4000166668788.html?spm=a2g0o.productlist.0.0.2c386be8fN3oCH&algo_pvid=6da3d77b-f49d-4e6b-8dba-c9c7446cd7b4&algo_expid=6da3d77b-f49d-4e6b-8dba-c9c7446cd7b4-1&btsid=2100bddf16068135762546912e571d&ws_ab_test=searchweb0_0,searchweb201602_,searchweb201603_)
 
 ### Problems
 
@@ -40,13 +42,22 @@ Some boards have uFL antenna connectors, whereas almost all external active ante
 
 ### Most cost-efficient setup
 
-NEO6 GPS modules are available at very low cost (1-2Eur) at chinese dealers (Aliexpress) and are perfectly usable as long as they allow connecting and external GPS antenna and provide a PPS signal.
+NEO6 GPS modules are available at very low cost (1-2Eur) at chinese dealers (Aliexpress) and are perfectly usable as long as they allow connecting an active external GPS antenna and provide a PPS signal.
 
 ## Software
 
-* gspd
+* Raspberry Linux preparations
+
+  * Serial port console
+  * bluetooth overlay disable
+  * pps kernel drivers and gpio
+  
+* gspd tests
+* pps tests
+
+  * pps-utils
+  
 * chrony
-* pps kernel drivers and pps-utils
 
 ## Setting up GPS
 
