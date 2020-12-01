@@ -74,12 +74,56 @@ _Typical wiring between GPS module and Raspberry Pi connector._
 
 Note: If your GPS module is connected via USB, you only need to connect the PPS connector on the GPS module to GPIO 4 on the Raspberry. Power (Vin), Gnd and Tx/Rx are handled via USB.
 
+### Test
+
+**Before you continue with software:** At this point, the GPS module should be connected to the Raspberry Pi and the active antenna. Power up the Raspberry Pi, and check that the GPS module receives the GPS signal (the antenna must have unhindered access to the open sky, it does *not* work indoors!).
+
+If reception is ok, a led ("FIX" or "PPS") should start blinking on your GPS module.
+
+### More information
+
+* Adafruit has an execellent [GPS guide](https://learn.adafruit.com/adafruit-ultimate-gps) for their ultimate GPS module.
+
 ## Software
 
-* Raspberry Linux preparations
+### Raspberry Linux preparations
 
-  * Serial port console
-  * bluetooth overlay disable
+#### Serial port console
+
+If your GPS board is connected via serial connection (Rx/Tx), you need to "free up" Raspberry's serial port, which by default is used to connect a serial (debug) console. We need to disable that console to prevent it from interferring with the GPS module. 
+
+This is *not* needed, if your module is connected via USB.
+
+How to disable the serial console on Raspberry variies greatly depending on hardware revision and Linux flavour used. A few examples:
+
+##### For Raspberry Pi 4 with Raspberry Pi OS:
+
+1. Start raspi-config: `sudo raspi-config`.
+2. Select option 3 - Interface Options.
+3. Select option P6 - Serial Port.
+4. At the prompt Would you like a login shell to be accessible over serial? answer 'No'
+5. At the prompt Would you like the serial port hardware to be enabled? answer 'Yes'
+6. Exit raspi-config and reboot the Pi for changes to take effect.
+
+See [Source](https://www.raspberrypi.org/documentation/configuration/uart.md#:~:text=Disable%20Linux%20serial%20console&text=This%20can%20be%20done%20by,Select%20option%20P6%20%2D%20Serial%20Port) at raspberrypi.org.
+
+Older versions of `raspi-config` hide the same serial options under "Advanced options"
+
+##### Other linux distributions and manual configuration
+
+1. Edit `/boot/cmdline.txt` and remove references to the serial port `ttyAMA0`. E.g. remove: `console=ttyAMA0,115200` and (if present) `kgdboc=ttyAMA0,115200`.
+2. Disable getty on serial port. `sudo systemctl disable getty@ttyAMA0` or, on some Linux distris: `sudo systemctl disable serial-getty@ttyAMA0`
+3. Enable uart in `/boot/config.txt`, add a line `enable_uart=1`
+4. For RPI 3 or later disable bluetooth via overlay, add another line to `/boot/config.txt`: `dtoverlay=pi3-disable-bt-overlay`
+
+
+  
+See also: [this reference for RPI 3, 4 and zero](https://www.abelectronics.co.uk/kb/article/1035/raspberry-pi-3-serial-port-usage).  
+  
+  
+  
+  
+  
   * pps kernel drivers and gpio
   
 * gspd tests
