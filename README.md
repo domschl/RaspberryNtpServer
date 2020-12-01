@@ -16,6 +16,8 @@ is Raspberry Pi 4, due to 1Gbit network interface and fast hardware for lowest p
   * GSP module with USB, SMA connector and PPS: [Keystudio GPS module](https://wiki.keyestudio.com/KS0319_keyestudio_GPS_Module)
   * Cheap NEO6 modules: [Aliexpress NEO6](https://www.aliexpress.com/item/32800500501.html?spm=a2g0o.productlist.0.0.2eae3298PesRP8&algo_pvid=89486c29-bfb7-414c-a88d-81a9972f8080&algo_expid=89486c29-bfb7-414c-a88d-81a9972f8080-1&btsid=2100bdd516068129046292696e617f&ws_ab_test=searchweb0_0,searchweb201602_,searchweb201603_)
 
+  <img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/antenna.jpg" align="right" width="200" height="200" />
+  
 * Active GPS antenna
 
 When selecting a GPS antenna, make sure to get an active antenna with 3-5V power input. Passive antennas often look similar, but reception quality is far worse at similar cost.
@@ -27,7 +29,7 @@ Some boards have uFL antenna connectors, whereas almost all external active ante
 * [Adafruit uFL to SMA adapter](https://www.adafruit.com/product/851)
 * [Various uFL to SMA adapters](https://www.aliexpress.com/item/4000166668788.html?spm=a2g0o.productlist.0.0.2c386be8fN3oCH&algo_pvid=6da3d77b-f49d-4e6b-8dba-c9c7446cd7b4&algo_expid=6da3d77b-f49d-4e6b-8dba-c9c7446cd7b4-1&btsid=2100bddf16068135762546912e571d&ws_ab_test=searchweb0_0,searchweb201602_,searchweb201603_)
 
-### Problems
+### To check
 
 #### Is external antenna selected?
 
@@ -46,6 +48,7 @@ When not using a Pi Hat, decide between USB- and serial connection.
 USB-Connection:
 * No extra cables for Vcc, GND, Tx, Rx are needed: both powersupply and communication goes over USB.
 * No modification of Raspberry's serial console is needed, easier software installation
+* Example: [Keystudio GPS module](https://wiki.keyestudio.com/KS0319_keyestudio_GPS_Module)
 
 Serial connection:
 * Usually cheaper, if a module is purchased.
