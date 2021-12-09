@@ -205,7 +205,7 @@ Once you receive a PPS signal and GPSD is configured, continue.
 
 ### Access permissions for `/dev/pps0`
 
-Some linux distribution only allow `root` to read or access `/dev/pps0`. This is no issue, if only root services want to access `/dev/pps0`. Not that recent versions of `chronyd` drop privileges after start, and then might not be able to access `/dev/pps0` anymore.
+Some linux distribution only allow `root` to read or access `/dev/pps0`. This is no issue, if only root services want to access `/dev/pps0`. Note that recent versions of `chronyd` drop privileges after start, and then might not be able to access `/dev/pps0` anymore.
 
 ## Setting up Chrony as time-server
 
