@@ -1,4 +1,4 @@
-# GPS disciplined Stratum-1 NTP Server with Raspberry PI and GPS - a HowTo
+# GPS disciplined Stratum-1 NTP Server with Raspberry PI - a HowTo
 
 Stratum-1 NTP time server with Raspberry Pi, GPS and Chrony: how to build a precision time server.
 
