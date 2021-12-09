@@ -1,4 +1,4 @@
-# RaspberryNtpServer
+# Raspberry PI Ntp Server with Chrony and GPS - a HowTo
 
 Stratum-1 NTP time server with Raspberry Pi, GPS and Chrony: how to build a precision time server.
 
@@ -203,10 +203,15 @@ source 0 - assert 1606833768.999998751, sequence: 341092 - clear  0.000000000, s
 
 Once you receive a PPS signal and GPSD is configured, continue.
 
+### Access permissions for `/dev/pps0`
+
+Some linux distribution only allow `root` to read or access `/dev/pps0`. This is no issue, if only root services want to access `/dev/pps0`. Not that recent versions of `chronyd` drop privileges after start, and then might not be able to access `/dev/pps0` anymore.
 
 ## Setting up Chrony as time-server
 
 **Note:** Before you setup `chrony`, make sure you completed `gpsd` configuration and that `gpsd` is running ok, and that you have a valid PPS signal at `/dev/pps0`.
+
+Recent chronyd versions drop root privilege after start (check for the `-u` option in `chronyd.service` to see the user that will be used to run `chronyd`). If `/dev/pps0` is not accessible for that user, pps won't work. There are two solutions: either use a version of chronyd that doesn't drop privileges and runs as root, or setup a `udev` rule that allows access to `/dev/pps0` for the process-user of `chronyd`.
 
 Install `chrony`, an alternative NTP server that in my experience results in higher precision time servers than good old ntpd.
 
