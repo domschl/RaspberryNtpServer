@@ -184,7 +184,7 @@ After a reboot, a new device `/dev/pps0` should exist, and `dmesg` should show s
 [    7.550775] pps_ldisc: PPS line discipline registered
 ```
 
-Now use `ppstest` (you might need to install `pps-utils`):
+Now use `ppstest` (you might need to install `pps-utils` or `pps-tools` depending on your distri:
 
 `sudo ppstest /dev/pps0`
 
