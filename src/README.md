@@ -4,13 +4,13 @@ The display shows current NTP time and date, the PPS signal locking state, the o
 
 If you see an address of some time server, PPS lock is not (yet) working.
 
-<img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd.jpg" align="right" width="300" />
-
 ## Hardware requirements
 
 - Display: HD44780 2004 LCD Display 4x20 characters with I2C interface (address 0x27 is assumed by the code)
 
 Make sure that I2C is enable on your Raspberry PI.
+
+<img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/gps-with-pps-and-i2c-lcd.jpg" width="600" />
 
 Connect the LCD Display the GND, 5V and SDA and SCL pins or the Raspberry PI.
 
