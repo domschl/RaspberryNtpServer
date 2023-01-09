@@ -347,6 +347,12 @@ cmdallow 192.168/16
 
 For more, check the [official chrony documenation](https://chrony.tuxfamily.org/doc/4.0/chrony.conf.html)
 
+## Addd a 4x20 hardware LCD display
+
+<img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd.jpg" align="right" width="300" />
+
+Optionally, you can use [this sub-project to a status display to the Raspberry Pi](src/README.md).
+
 ## History
 
 * 2023-01-09: Code for 4x20 LCD display for NTP server PPS state added.
