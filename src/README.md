@@ -1,6 +1,63 @@
 # Simple 4x20 LCD display for Raspberry Pi NTP Server
 
+The display shows current NTP time and date, the PPS signal locking state, the offset to the NTP time, the number of satellites that are currently used, and, if no PPS lock is available, alternatively the address of the time server used.
+
+If you see an address of some time server, PPS lock is not (yet) working.
+
 <img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd.jpg" align="right" width="300" />
 
-Display: HD44780 2004 LCD Display 4x20 characters with I2C interface
+## Hardware requirements
+
+- Display: HD44780 2004 LCD Display 4x20 characters with I2C interface (address 0x27 is assumed by the code)
+
+Make sure that I2C is enable on your Raspberry PI.
+
+Connect the LCD Display the GND, 5V and SDA and SCL pins or the Raspberry PI.
+
+## Software requirements
+
+This project uses Martijn Braam's python gpsd driver <https://github.com/MartijnBraam/gpsd-py3>. Install with:
+
+```bash
+pip install gsdp-py3
+```
+
+## Installation
+
+Copy the python files to `/opt/chronotron`, and the `service` file to `/etc/systemd/system`.
+Enable the systemd server `chronotron` with:
+
+```bash
+sudo systemctl enable chronotron
+sudo systemctl start chronotron
+```
+
+Check, if everthing works:
+
+```bash
+sudo systemctl status chronotron
+```
+
+If everything worked, the output should be something like:
+
+```
+chronotron.service - Display chrony statistics on 4x20 LCD
+     Loaded: loaded (/etc/systemd/system/chronotron.service; enabled; preset: disabled)
+     Active: active (running) since Tue 2022-10-25 14:44:17 CEST; 2 months 15 days ago
+   Main PID: 370 (chronotron.py)
+      Tasks: 2 (limit: 3921)
+        CPU: 3d 5h 34min 24.354s
+     CGroup: /system.slice/chronotron.service
+             └─370 /usr/bin/python /opt/chronotron/chronotron.py
+
+Oct 25 14:44:17 chronotron systemd[1]: Started Display chrony statistics on 4x20 LCD.
+```
+
+## Notes:
+
+The `chronotron.py` systemd service checks periodically `chronyc` for NTP statistics (`chronyc` must be in the path!), and uses `gpsd` for the GPS statistics (number of satellites).
+
+- `button.py` is currently not used.
+- `i2c_lcd.py` is a buffered driver for the LCD display.
+- `chronotron.service` is the systemd service file.
 
