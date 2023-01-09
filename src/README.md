@@ -14,6 +14,15 @@ Make sure that I2C is enable on your Raspberry PI.
 
 Connect the LCD Display the GND, 5V and SDA and SCL pins or the Raspberry PI.
 
+Note: if your display uses a different address than `0x27`, 
+or if you are using a very old Raspberry that still uses `sm_bus=0`, you need to adapt [this line](https://github.com/domschl/RaspberryNtpServer/blob/2a3551de7954e77f23b2a313be044d94047ab4d5/src/chronotron.py#L114):
+
+```python
+lcd = LcdDisplay(sm_bus=1, i2c_addr=0x27, cols=20, rows=4)
+```
+
+Old Raspis use `sm_bus=0`.
+
 ## Software requirements
 
 This project uses Martijn Braam's python gpsd driver <https://github.com/MartijnBraam/gpsd-py3>. Install with:
