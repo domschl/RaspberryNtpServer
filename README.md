@@ -5,7 +5,7 @@ Stratum-1 NTP time server with Raspberry Pi, GPS and Chrony:
 <img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd.jpg" align="right" width="300" />
 
 - how to build a precision time server.
-- (optional) how to add a 4x20 LCD to display server status and GPS and PPS information.
+- (optional) [how to add a 4x20 LCD to display](src/README.md) server status and GPS and PPS information.
 
 ## Requirements - Hardware
 
