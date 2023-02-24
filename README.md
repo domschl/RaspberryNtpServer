@@ -233,7 +233,7 @@ KERNEL=="ttyS0", RUN+="/bin/setserial -v /dev/%k low_latency irq 4"
 
 To activate those new `udev` rules, either reboot, or use: `sudo udevadm control --reload-rules && sudo udevadm trigger`.
 
-This assumes `_chrony` being the user of the `chronyd` process (check with `ps aux | grep chronyd`) and a serial connection being used.
+This assumes `_chrony` being the user/group of the `chronyd` process (check with `ps aux | grep chronyd`) and a serial connection (here `/dev/ttyS0`) being used.
 
 Thanks @cvonderstein for providing this information, see [#1](https://github.com/domschl/RaspberryNtpServer/issues/1) for further discussion.
 
