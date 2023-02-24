@@ -77,7 +77,7 @@ NEO6 GPS modules are available at very low cost (1-2Eur) at chinese dealers (Ali
 
 _Typical wiring between GPS module and Raspberry Pi connector._
 
-Note: If your GPS module is connected via USB, you only need to connect the PPS connector on the GPS module to GPIO 4 on the Raspberry. Power (Vin), Gnd and Tx/Rx are handled via USB.
+> **Note:** If your GPS module is connected via USB, you only need to connect the PPS connector on the GPS module to GPIO 4 on the Raspberry. Power (Vin), Gnd and Tx/Rx are handled via USB.
 
 ### Test
 
@@ -214,7 +214,7 @@ Some linux distribution only allow `root` to read or access `/dev/pps0`. This is
 
 ## Setting up Chrony as time-server
 
-**Note:** Before you setup `chrony`, make sure you completed `gpsd` configuration and that `gpsd` is running ok, and that you have a valid PPS signal at `/dev/pps0`.
+> **Note:** Before you setup `chrony`, make sure you completed `gpsd` configuration and that `gpsd` is running ok, and that you have a valid PPS signal at `/dev/pps0`.
 
 Recent chronyd versions drop root privilege after start (check for the `-u` option in `chronyd.service` to see the user that will be used to run `chronyd`). If `/dev/pps0` is not accessible for that user, pps won't work. There are two solutions: either use a version of chronyd that doesn't drop privileges and runs as root, or setup a `udev` rule that allows access to `/dev/pps0` for the process-user of `chronyd`.
 
@@ -255,7 +255,7 @@ refclock PPS /dev/pps0 lock GPS
 refclock SHM 0 refid GPS precision 1e-1 offset 0.01 delay 0.2 noselect
 ```
 
-**Note:** For recent `chrony` versions, an offset of `0.0` seems to prevent GPS sync, hence set it to `offset 0.01` (or any small, non-zero value) for start. See below, how to get the actual correct `offset` value.
+> **Note:** For recent `chrony` versions, an offset of `0.0` seems to prevent GPS sync, hence set it to `offset 0.01` (or any small, non-zero value) for start. See below, how to get the actual correct `offset` value.
 
 This uses a shared memory device `SHM` to get unprecise time information from GPSD (low precision, marked as `noselect`, so that chrony doesn't try to sync to serial time data). This unprecise time information is then synchronised with the much more precise PPS signal.
 
@@ -313,7 +313,7 @@ refclock PPS /dev/pps0 lock GPS
 refclock SHM 0 refid GPS precision 1e-1 offset 0.512 delay 0.2 noselect
 ```
 
-**Note:** A value of `offset 0.0` seems to prevent synchronisation for some versions of chrony, so use some small non-zero value instead, if a value close to 0 is required for your installation.
+> **Note:** A value of `offset 0.0` seems to prevent synchronisation for some versions of chrony, so use some small non-zero value instead, if a value close to 0 is required for your installation.
 
 Restart `chrony` with `sudo systemctl restart chronyd`, and check `chronyc` again:
 
