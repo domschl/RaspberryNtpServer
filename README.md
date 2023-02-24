@@ -218,6 +218,27 @@ Some linux distribution only allow `root` to read or access `/dev/pps0`. This is
 
 Recent chronyd versions drop root privilege after start (check for the `-u` option in `chronyd.service` to see the user that will be used to run `chronyd`). If `/dev/pps0` is not accessible for that user, pps won't work. There are two solutions: either use a version of chronyd that doesn't drop privileges and runs as root, or setup a `udev` rule that allows access to `/dev/pps0` for the process-user of `chronyd`.
 
+If you [compile](https://chrony.tuxfamily.org/doc/3.5/installation.html) `chrony` yourself, there is an option `--disable-privdrop` for `configure`. See `configure -h` for all options for building `chrony`.
+
+### `udev` rules example
+
+Udev rules are tricky and depend on the user of the `chronyd` process and the type of connection your are using.
+
+Create a file `/etc/udev/rules.d/pps-sources.rules` starting with this example, which you will need to modify to your configuration:
+
+```
+KERNEL=="pps0", OWNER="root", GROUP="_chrony", MODE="0660"
+KERNEL=="ttyS0", RUN+="/bin/setserial -v /dev/%k low_latency irq 4"
+```
+
+To activate those new `udev` rules, either reboot, or use: `sudo udevadm control --reload-rules && sudo udevadm trigger`.
+
+This assumes `_chrony` being the user of the `chronyd` process (check with `ps aux | grep chronyd`) and a serial connection being used.
+
+Thanks @cvonderstein for providing this information, see [#1](https://github.com/domschl/RaspberryNtpServer/issues/1) for further discussion.
+
+### Installation of `chrony`
+
 Install `chrony`, an alternative NTP server that in my experience results in higher precision time servers than good old ntpd.
 
 Make sure that no other time server (`ntdp`, `systemd-timedated`) is active, e.g.
@@ -227,12 +248,14 @@ sudo systemctl disable systemd-timedated
 sudo systemctl stop systemd-timedated
 ```
 
-Edit `/etc/chrony.conf`, and add two lines:
+Depending on you distri and chrony versione, the config is either `/etc/chrony/chrony.conf` or `/etc/chrony.conf`, edit the file and add two lines:
 
 ```
 refclock PPS /dev/pps0 lock GPS
-refclock SHM 0 refid GPS precision 1e-1 offset 0.0 delay 0.2 noselect
+refclock SHM 0 refid GPS precision 1e-1 offset 0.01 delay 0.2 noselect
 ```
+
+**Note:** For recent `chrony` versions, an offset of `0.0` seems to prevent GPS sync, hence set it to `offset 0.01` (or any small, non-zero value) for start. See below, how to get the actual correct `offset` value.
 
 This uses a shared memory device `SHM` to get unprecise time information from GPSD (low precision, marked as `noselect`, so that chrony doesn't try to sync to serial time data). This unprecise time information is then synchronised with the much more precise PPS signal.
 
@@ -289,6 +312,8 @@ Wait a few minutes for the offset to stabilize, note it's value, and edit `/etc/
 refclock PPS /dev/pps0 lock GPS
 refclock SHM 0 refid GPS precision 1e-1 offset 0.512 delay 0.2 noselect
 ```
+
+**Note:** A value of `offset 0.0` seems to prevent synchronisation for some versions of chrony, so use some small non-zero value instead. 
 
 Restart `chrony` with `sudo systemctl restart chronyd`, and check `chronyc` again:
 
@@ -355,4 +380,5 @@ Optionally, you can use [this sub-project to a status display to the Raspberry P
 
 ## History
 
+* 2023-02-24: Added information by @cvonderstein on initial `offset 0.01` and `udev` rules, see [#1](https://github.com/domschl/RaspberryNtpServer/issues/1) for details.
 * 2023-01-09: Code for 4x20 LCD display for NTP server PPS state added.
