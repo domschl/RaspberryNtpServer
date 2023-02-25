@@ -233,9 +233,7 @@ KERNEL=="ttyS0", RUN+="/bin/setserial -v /dev/%k low_latency irq 4"
 
 To activate those new `udev` rules, either reboot, or use: `sudo udevadm control --reload-rules && sudo udevadm trigger`.
 
-This assumes `_chrony` being the user/group of the `chronyd` process (check with `ps aux | grep chronyd`) and a serial connection (here `/dev/ttyS0`) being used.
-
-Thanks @cvonderstein for providing this information, see [#1](https://github.com/domschl/RaspberryNtpServer/issues/1) for further discussion.
+This assumes `_chrony` being the user/group of the `chronyd` process (check with `ps aux | grep chronyd`) and a serial connection (here `/dev/ttyS0`) being used.[^1]
 
 ### Installation of `chrony`
 
@@ -378,7 +376,13 @@ For more, check the [official chrony documenation](https://chrony.tuxfamily.org/
 
 Optionally, you can use [this sub-project to a status display to the Raspberry Pi](src).
 
+
+
 ## History
 
 * 2023-02-24: Added information by @cvonderstein on initial `offset 0.01` and `udev` rules, see [#1](https://github.com/domschl/RaspberryNtpServer/issues/1) for details.
 * 2023-01-09: Code for 4x20 LCD display for NTP server PPS state added.
+
+### References
+
+[^1]: Thanks @cvonderstein for providing this information, see [#1](https://github.com/domschl/RaspberryNtpServer/issues/1) for further discussion.
