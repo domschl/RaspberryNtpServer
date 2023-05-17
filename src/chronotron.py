@@ -22,7 +22,7 @@ def get_sats(host="localhost"):
     return "[--]"
 
 
-def exec(cmd):
+def exec_cmd(cmd):
     ret = []
     p = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=-1
@@ -40,7 +40,7 @@ def exec(cmd):
 
 def ntp_offset():
     cmd = ["chronyc", "tracking"]
-    ret = exec(cmd)
+    ret = exec_cmd(cmd)
     for line in ret:
         pars = line.split(":", 1)
         if len(pars) == 2:
@@ -56,7 +56,7 @@ def ntp_offset():
 
 def get_src():
     cmd = ["chronyc", "sources"]
-    ret = exec(cmd)
+    ret = exec_cmd(cmd)
     pps_locked = "-"
     locked = "-"
     src = "--"
