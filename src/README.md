@@ -6,7 +6,10 @@ If you see an address of some time server, PPS lock is not (yet) working.
 
 ## Hardware requirements
 
-- Display: HD44780 2004 LCD Display 4x20 characters with I2C interface (address 0x27 is assumed by the code)
+- Display: HD44780 2004 LCD Display 4x20 characters with I2C interface (address 0x27 is assumed by the code), use for example:
+  - Adafruit [LCD 4x20](https://www.adafruit.com/product/198) and [I2C Adapter](https://www.adafruit.com/product/292), description: (https://learn.adafruit.com/i2c-spi-lcd-backpack). Advantage: Stemma QT adapter (QWIIC) that can be also added to [Raspberry PI](https://www.adafruit.com/product/4463#:~:text=The%20SparkFun%20Qwiic%20or%20Stemma%20QT%20SHIM%20for,QT%20or%20Qwiic%29%20connector%20to%20your%20Raspberry%20Pi.) for clean cabling.
+  - Amazon kit [sunfounder kit](https://www.amazon.com/SunFounder-Serial-Module-Arduino-Mega2560/dp/B01GPUMP9C)
+  - AliExpress kit [TZT Five Star](https://de.aliexpress.com/item/1005001679675215.html
 
 Make sure that I2C is enable on your Raspberry PI.
 
