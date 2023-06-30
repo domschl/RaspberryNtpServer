@@ -4,6 +4,8 @@ The display shows current NTP time and date, the PPS signal locking state, the o
 
 If you see an address of some time server, PPS lock is not (yet) working.
 
+Note: Review [this line](https://github.com/domschl/RaspberryNtpServer/blob/c42218ec63e34c5db5b6ec6da0f1ef79b525e863/src/chronotron.py#L119) which switches off the backlight during night-time.
+
 ## Hardware requirements
 
 - Display: HD44780 2004 LCD Display 4x20 characters with I2C interface (address 0x27 is assumed by the code), use for example:
