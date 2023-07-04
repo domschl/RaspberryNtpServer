@@ -32,14 +32,29 @@ Old Raspis use `sm_bus=0`.
 
 > **Note:** if the LCD screen looks inverted or too faint, use the potentiometer on the adapter-board to adjust the contrast.
 
-
 ## Software requirements
 
-This project uses Martijn Braam's python gpsd driver <https://github.com/MartijnBraam/gpsd-py3>. Install with:
+This project uses Martijn Braam's python gpsd driver <https://github.com/MartijnBraam/gpsd-py3> and `smbus`.
+
+Please check first, if either of those packages are available via your linux package manager. 
+
+If not, they can be installed with:
+
+Install with:
 
 ```bash
-pip install gpsd-py3
+pip install gpsd-py3 smbus
+# Note: if the chronotron.service runs as root (default), you need instead install as sudo:
+sudo pip install gpsd-py3 smbus
+# (This is not recommended and may generate conflicts with your package manager, so first check, if
+# either gpsd-py3 or smbus are available as python packages with your default package manager!)
 ```
+
+Currently, a number of distributions is changing to Python 3.11. After each Python-update, you'll need to
+reinstall the required packages! 
+
+If `chronotron` does not start, check with `sudo systemctl status chronotron`: It will show if it can't 
+import a required packages.
 
 ## Installation
 
@@ -79,4 +94,5 @@ The `chronotron.py` systemd service checks periodically `chronyc` for NTP statis
 - `button.py` is currently not used.
 - `i2c_lcd.py` is a buffered driver for the LCD display.
 - `chronotron.service` is the systemd service file.
+
 
