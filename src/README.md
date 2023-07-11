@@ -156,6 +156,7 @@ MS Name/IP address         Stratum Poll Reach LastRx Last sample
 #### References
 
 - <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/configuring_basic_system_settings/using-chrony_configuring-basic-system-settings>
+- [chronyc documentation](https://github.com/mlichvar/chrony/blob/master/doc/chronyc.adoc)
 
 ## Notes:
 
