@@ -83,7 +83,11 @@ Note: If your GPS module is connected via USB, you only need to connect the PPS 
 
 **Before you continue with software:** At this point, the GPS module should be connected to the Raspberry Pi and the active antenna. Power up the Raspberry Pi, and check that the GPS module receives the GPS signal (the antenna must have unhindered access to the open sky, it does *not* work indoors!).
 
-If reception is ok, a led ("FIX" or "PPS") should start blinking on your GPS module.
+If reception is ok, a led ("FIX" or "PPS") should start blinking on your GPS module. 
+
+Check the documentation for your specific hardware how "FIX" is signaled:
+
+- The Adafruit module blinks once per second if there is no fix and once every 10 seconds when there is a fix.
 
 ### More information
 
@@ -134,7 +138,13 @@ $GPGSA,A,3,123,303,248,205,037,415,,,,,,,1.59,1.340,0.90*049
 
 ## Setting up GPSD
 
-Once you successfully receive output from your GPS module, next step is to install `gpsd` via your packet manager.
+Once you successfully receive output from your GPS module, next step is to install `gpsd` via your package manager.
+
+For Raspberry Pi OS (and Ubuntu and Debian variants), that would be:
+
+```bash
+sudo apt install gpsd
+```
 
 Edit `/etc/default/gpsd`:
 
@@ -239,6 +249,7 @@ This uses a shared memory device `SHM` to get unprecise time information from GP
 Now enable and start `chrony`:
 
 ```
+# Note: Some distributions use `chrony` instead of `chronyd`, so replace, if necessary:
 sudo systemctl enable chronyd
 sudo systemctl start chronyd
 ```
@@ -340,10 +351,52 @@ To be able to administer the chrony time server over the net, add:
 cmdallow 192.168/16
 ```
 
+### Remote testing
+
+The tool `sntp` (available by default on macOS, part of the `ntp` package for most linux distributions)
+allows for simple remote testing:
+
+```Note:``` when installing `ntp` for getting access to the `sntp` tool, make sure that you do not accidentally activate the `ntp` server which will conflict with your chrony installation.
+
+```bash
+sntp <ip-or-hostname-of-raspberry-chrony-server>
+```
+
+yields (mac connected via WLAN):
+```bash
+sntp chronotron
+# Output:
++0.011341 +/- 0.002986 chronotron 192.168.178.3
+```
+
+More information is available with `sntp -d`
+
+```bash
+sntp -d chronotron
+# Output:
+sntp_exchange {
+        result: 0 (Success)
+        header: 24 (li:0 vn:4 mode:4)
+       stratum: 01 (1)
+          poll: 00 (1)
+     precision: FFFFFFE8 (5.960464e-08)
+         delay: 0000.0001 (0.000015259)
+    dispersion: 0000.000B (0.000167847)
+           ref: 50505300 ("PPS ")
+    ...
+}
+```
+
+Interesting information is for example:
+
+- `ref: xx.. ("PPS")`
+- `precision: (5.9e-08)`
+
 #### Further optimizations in `chrony.conf`
 
 * `lock_all` to make sure chrony is always in memory.
 * `local stratum 1` to signal precision time.
+* `allow` without any address simply allows all networks. (Including external access, if your machine is connected to the internet!)
 
 For more, check the [official chrony documenation](https://chrony.tuxfamily.org/doc/4.0/chrony.conf.html)
 
@@ -355,4 +408,5 @@ Optionally, you can use [this sub-project to a status display to the Raspberry P
 
 ## History
 
+* 2023-07-11: Documentation fixes from #4 (thx. @glenne)
 * 2023-01-09: Code for 4x20 LCD display for NTP server PPS state added.
