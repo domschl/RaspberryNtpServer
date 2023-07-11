@@ -417,7 +417,7 @@ Interesting information is for example:
 - `ref: xx.. ("PPS")`
 - `precision: (5.9e-08)`
 
-#### Further optimizations in `chrony.conf`
+### Further optimizations in `chrony.conf`
 
 * `lock_all` to make sure chrony is always in memory.
 * `local stratum 1` to signal precision time.
@@ -438,5 +438,7 @@ Optionally, you can use [this sub-project to a status display to the Raspberry P
 * 2023-01-09: Code for 4x20 LCD display for NTP server PPS state added.
 
 ### References
+
+- [`chrony` documentation (mirror)](https://github.com/mlichvar/chrony/tree/master/doc)
 
 [^1]: Thanks @cvonderstein for providing this information, see [#1](https://github.com/domschl/RaspberryNtpServer/issues/1) for further discussion.
