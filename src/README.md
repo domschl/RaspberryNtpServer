@@ -92,6 +92,70 @@ Oct 25 14:44:17 chronotron systemd[1]: Started Display chrony statistics on 4x20
 
 ## Notes on the display-information
 
+<img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd-notes.jpg" align="right" width="600" />
+
+1. Time and date according to NTP
+2. Shows the output of `chronyc tracking`, entry `system time`, the time difference to the NTP reference (see below for further information).
+3. `L[ ]` no lock, `L[*]` lock. A lock (`*`) indicates that time synchronisation is established, either via remote NTP servers or GPS + PPS
+4. `PPS` signales that the lock is active using GPS and PPS, the server is in high-precision stratum 1 mode. If instead a hostname is displayed, then PPS is NOT active, and the network is used for time synchronisation, resulting in lower precision.
+5. `SAT[nn]`, `nn` is the number of satellites that are actively used for time synchronisation.
+6. Shows output of `chronyc sources`, the last column of the currently active source, which is the estimated error (see below for further information)
+
+### Further information and references
+
+#### `chronyc tracking`
+
+Marked with >>>nnnn.nnnn<<< is the information displayed at (2).
+Here, the system is 0.000000100 seconds faster than NTP ref.
+
+```
+chronyc tracking
+# sample output:
+Reference ID    : 50505300 (PPS)
+Stratum         : 1
+Ref time (UTC)  : Tue Jul 11 07:22:07 2023
+System time     : >>>0.000000100<<< seconds fast of NTP time
+Last offset     : +0.000000030 seconds
+RMS offset      : 0.000010080 seconds
+Frequency       : 10.392 ppm fast
+Residual freq   : -0.006 ppm
+Skew            : 0.005 ppm
+Root delay      : 0.000000001 seconds
+Root dispersion : 0.000384213 seconds
+Update interval : 16.0 seconds
+Leap status     : Normal
+```
+
+#### `chronyc sources`
+
+Marked with `>>>nnn<<<` is the information displayed at (6).
+Here the estimated error of the PPS signal is 591ns
+
+```
+chronyc sources -v
+# sample output with explanation (-v paramenter):
+  .-- Source mode  '^' = server, '=' = peer, '#' = local clock.
+ / .- Source state '*' = current best, '+' = combined, '-' = not combined,
+| /             'x' = may be in error, '~' = too variable, '?' = unusable.
+||                                                 .- xxxx [ yyyy ] +/- zzzz
+||      Reachability register (octal) -.           |  xxxx = adjusted offset,
+||      Log2(Polling interval) --.      |          |  yyyy = measured offset,
+||                                \     |          |  zzzz = estimated error.
+||                                 |    |           \
+MS Name/IP address         Stratum Poll Reach LastRx Last sample               
+===============================================================================
+#? GPS                           0   4     0   780    +43ms[  +43ms] +/-  200ms
+#* PPS                           0   4     0   782   +186ns[ +217ns] +/-  >>>591ns<<<
+^? 2003:2:2:140:194:25:134:>     2  10   377   340   +141us[ +141us] +/-   17ms
+^? time.ontobi.com               2  10   377   264   +139us[ +139us] +/-   13ms
+^? bblock.dev                    2  10   377   631   +209us[ +209us] +/-   12ms
+^? time01.nevondo.com            2  10   377   721   +181us[ +181us] +/-   28ms
+^? static.33.250.47.78.clie>     3  10   377  1168   -191us[ -213us] +/-   15ms```
+```
+
+#### References
+
+- <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/configuring_basic_system_settings/using-chrony_configuring-basic-system-settings>
 
 ## Notes:
 
