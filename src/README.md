@@ -34,7 +34,7 @@ Old Raspis use `sm_bus=0`.
 
 ## Software requirements
 
-This project uses Martijn Braam's python gpsd driver <https://github.com/MartijnBraam/gpsd-py3> and `smbus`.
+This project uses Martijn Braam's python gpsd driver <https://github.com/MartijnBraam/gpsd-py3> (minimum version `0.3.0`, and `smbus` (already available on some distributions).
 
 Please check first, if either of those packages are available via your linux package manager. 
 
@@ -43,7 +43,10 @@ If not, they can be installed with:
 Install with:
 
 ```bash
-pip install gpsd-py3 smbus
+# You need at least version 0.3.0 of gpsd-py3:
+pip install gpsd-py3
+# If smbus is not available, install with:
+pip install smbus
 # Note: if the chronotron.service runs as root (default), you need instead install as sudo:
 sudo pip install gpsd-py3 smbus
 # (This is not recommended and may generate conflicts with your package manager, so first check, if
@@ -86,6 +89,9 @@ chronotron.service - Display chrony statistics on 4x20 LCD
 
 Oct 25 14:44:17 chronotron systemd[1]: Started Display chrony statistics on 4x20 LCD.
 ```
+
+## Notes on the display-information
+
 
 ## Notes:
 
