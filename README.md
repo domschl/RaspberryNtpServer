@@ -95,7 +95,7 @@ Check the documentation for your specific hardware how "FIX" is signaled:
 
 ## Software
 
-**Note:** _(Optional info)_ The original repository of `chrony` at <https://chrony.tuxfamily.org/> seems to be of low availability. In case of problems, use the mirror at <https://github.com/mlichvar/chrony)> if you want to reference the original `chrony` sources at some point.
+> **Note:** _(Optional info)_ The original repository of `chrony` at <https://chrony.tuxfamily.org/> seems to be of low availability. In case of problems, use the mirror at <https://github.com/mlichvar/chrony)> if you want to reference the original `chrony` sources at some point.
 
 ### Raspberry Linux preparations
 
@@ -381,7 +381,7 @@ cmdallow 192.168/16
 The tool `sntp` (available by default on macOS, part of the `ntp` package for most linux distributions)
 allows for simple remote testing:
 
-```Note:``` when installing `ntp` for getting access to the `sntp` tool, make sure that you do not accidentally activate the `ntp` server which will conflict with your chrony installation.
+> **Note:** when installing `ntp` for getting access to the `sntp` tool, make sure that you do not accidentally activate the `ntp` server which will conflict with your chrony installation.
 
 ```bash
 sntp <ip-or-hostname-of-raspberry-chrony-server>
@@ -423,7 +423,7 @@ Interesting information is for example:
 * `local stratum 1` to signal precision time.
 * `allow` without any address simply allows all networks. (Including external access, if your machine is connected to the internet!)
 
-For more, check the [official chrony documenation](https://chrony.tuxfamily.org/doc/4.0/chrony.conf.html), [mirror: chrony.conf](https://github.com/mlichvar/chrony/blob/master/doc/chrony.conf.adoc))
+For more, check the [official chrony documenation](https://chrony.tuxfamily.org/doc/4.0/chrony.conf.html), [mirror: chrony.conf](https://github.com/mlichvar/chrony/blob/master/doc/chrony.conf.adoc).
 
 ## Add a 4x20 hardware LCD display
 
