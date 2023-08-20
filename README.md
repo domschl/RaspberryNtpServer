@@ -224,6 +224,22 @@ Once you receive a PPS signal and GPSD is configured, continue.
 
 Some linux distribution only allow `root` to read or access `/dev/pps0`. This is no issue, if only root services want to access `/dev/pps0`. Note that recent versions of `chronyd` drop privileges after start, and then might not be able to access `/dev/pps0` anymore. See below for solutions (`udev` or running `chronyd` as root.)
 
+### Timeouts with Raspberry Pi OS 64-bit 2023-03 onwards
+
+`sudo ppstest /dev/pps0` yields:
+
+```
+found PPS source "/dev/pps0"
+ok, found 1 source(s), now start fetching data...
+source 0 - assert 1679340614.003464678, sequence: 84623 - clear  0.000000000, sequence: 0
+time_pps_fetch() error -1 (Connection timed out)
+```
+
+The 64-bit variant of Raspberry Pi OS has introduced a bug into the PPS handling via `i2c-bcm2835` kernel driver. See issue [6](https://github.com/domschl/RaspberryNtpServer/issues/6) for the ongoing discussion. So far there seem to be two options:
+
+- Switch to 32-bit kernel (by settings `arm_64bit=0` in `/boot/config.txt`)
+- Update to the latest kernel via `sudo rpi-update`. Make sure to read [Issue 6](https://github.com/domschl/RaspberryNtpServer/issues/6) discussion before proceeding.
+
 ## Setting up Chrony as time-server
 
 > **Note:** Before you setup `chrony`, make sure you completed `gpsd` configuration and that `gpsd` is running ok, and that you have a valid PPS signal at `/dev/pps0`.
