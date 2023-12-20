@@ -462,9 +462,14 @@ Interesting information is for example:
 - `ref: xx.. ("PPS")`
 - `precision: (5.9e-08)`
 
-### Raspberry Pi 5 and the PTP precision time protocol via ethernet
+### Raspberry Pi 5 and the PTP precision time protocol via ethernet  [OPTIONAL for SPECIAL SETTINGS]
 
 > **Note:** The PTP precision time protocol (IEEE 1588) is of limited use for home networks, it requires that every component (server, network switch, client) have hardware support for IEEE 1588 which is not the case for most consumer hardware. You cannot use PTP if a single component does not support it.
+
+An excellent overview over PTP, it's relation to NTP can be found at Redhat's [_combining ptp and ntp_](https://www.redhat.com/en/blog/combining-ptp-ntp-get-best-both-worlds) article.
+If you are not in a professional lab environment, _you might not need PTP at all!_
+
+#### Preparations
 
 You can verify that hardware timestamping is active by executing `sudo systemctl status chrony` right after start of chrony. You should see something like:
 
@@ -502,6 +507,55 @@ Hardware Receive Filter Modes:
 
 Required are the `hardware-transmit` and `hardware-receive` options.
 
+#### PTP software
+
+Make sure the kernel module `ptp` is loaded (`sudo modprobe ptp`). In addition, you will need `linuxptp` on both server and client. On the
+raspberry, it can be installed with `sudo apt install linuxptp`
+
+On the raspberry server:
+
+```
+sudo ptp4l -i eth0 ptp0 -m -2
+```
+
+The ptp server should start and output something like:
+
+```
+ptp4l[6491.320]: selected /dev/ptp0 as PTP clock
+ptp4l[6491.364]: port 1: INITIALIZING to LISTENING on INIT_COMPLETE
+ptp4l[6491.364]: port 0: INITIALIZING to LISTENING on INIT_COMPLETE
+ptp4l[6498.761]: port 1: LISTENING to MASTER on ANNOUNCE_RECEIPT_TIMEOUT_EXPIRES
+ptp4l[6498.761]: selected local clock d83add.fffe.b1d67a as best master
+ptp4l[6498.761]: port 1: assuming the grand master role
+```
+
+Now, on a client that has a network card with IEEE 1588 support (check with `ethtool -T eth0` that hardware-transmit is supported) and is connected either directly or via a PTP-IEEE 1588 enabled switch (hint: most consumer network switch _do not support the required protocol_!):
+
+again make sure module `ptp` is loaded, install `linuxptp` and:
+
+```
+sudo ptp4l -i enp86s0 -m -2 -s
+```
+
+the `-s` option enables slave mode for the client.
+
+If it works, you should see something like:
+
+```
+ptp4l[82232.615]: selected /dev/ptp0 as PTP clock
+ptp4l[82232.689]: port 1 (enp86s0): INITIALIZING to LISTENING on INIT_COMPLETE
+ptp4l[82232.689]: port 0 (/var/run/ptp4l): INITIALIZING to LISTENING on INIT_COMPLETE
+ptp4l[82232.689]: port 0 (/var/run/ptp4lro): INITIALIZING to LISTENING on INIT_COMPLETE
+ptp4l[82233.617]: port 1 (enp86s0): new foreign master d83add.fffe.b1d67a-1
+ptp4l[82237.617]: selected best master clock d83add.fffe.b1d67a
+ptp4l[82237.617]: port 1 (enp86s0): LISTENING to UNCALIBRATED on RS_SLAVE
+ptp4l[82239.619]: master offset   59823 s0 freq  -51831 path delay    4413
+ptp4l[82240.618]: master offset   59749 s1 freq -2154985 path delay   4159
+ptp4l[82241.618]: master offset   59733 s2 freq  +91748 path delay   4159
+```
+
+If you get any `received SYNC without timestamp` or similar with `DELAY`, then somewhere in your transmission chain there is non-IEEE 1588 hw, and the sync doesn't work.
+
 ### Further optimizations in `chrony.conf`
 
 * `lock_all` to make sure chrony is always in memory.
@@ -518,7 +572,7 @@ Optionally, you can use [this sub-project to a status display to the Raspberry P
 
 ## History
 
-- 2023-12-20: Raspberry 5 and suport for RTC and PTP.
+- 2023-12-20: Raspberry 5 and suport for RTC and PTP precision time protocol how-tos.
 - 2023-07-11: Documentation fixes (thx. @glenne), see [#4](https://github.com/domschl/RaspberryNtpServer/issues/4) for details. Mirror links for `chrony` added.
 - 2023-02-24: Added information by @cvonderstein on initial `offset 0.01` and `udev` rules, see [#1](https://github.com/domschl/RaspberryNtpServer/issues/1) for details.
 - 2023-01-09: Code for 4x20 LCD display for NTP server PPS state added.
