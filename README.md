@@ -19,7 +19,7 @@ is Raspberry Pi 4, due to 1Gbit network interface and fast hardware for lowest p
     - Support for the inbuilt hardware real time clock (RTC) that comes with the Raspberry Pi 5
     - Support for the PTP protocol, which allows to transmit precision time information via ethernet hardware
 
-Both options are documented below (`chrony` configuration)
+Both options are of limited advantage for most settings: the hardware clock is only useful for providing time during the first few seconds after boot (and if both GPS _and_ network are inaccessible), and PTP is a time standard requiring IEEE1588-enabled hardware everywhere and provides no advantages over NTP/chrony in most settings. Both however are documented below (See `chrony` configuration, PTP-chapter).
 
 - GPS module
 
@@ -72,7 +72,7 @@ Serial connection:
 
 ### Recommended setup
 
-* Raspberry PI 4
+* Raspberry PI 4 (or 5)
 * Either GPS hat (e.g. adafruit ultimate GPS hat + uFL to SMA-Adapter) or USB-GPS-Module with PPS output (e.g. keystudio gps module)
 * Active GPS antenna with SMA connector and 3-5V
 
@@ -99,6 +99,12 @@ Check the documentation for your specific hardware how "FIX" is signaled:
 ### More information
 
 * Adafruit has an excellent [GPS guide](https://learn.adafruit.com/adafruit-ultimate-gps) for their ultimate GPS module.
+
+### Professional / Lab considerations: PTP precision time protocol (OPTIONAL)
+
+If you are using laboratory equipment that uses PTP (precision time protocol) information (IEEE 1588), then you will need to use the Raspberry Pi 5 and make sure that your network switches are IEEE 1588 capable. Note that most consumer switches are not IEEE 1588 capable and cannot be used to set up a PTP network. See below (PTP chapter) for setup details and hardware tests.
+
+PTP is completely optional and not required in a network in order to have excellent results with your Raspberry Pi NTP server!
 
 ## Software
 
