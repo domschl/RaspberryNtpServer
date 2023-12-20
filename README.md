@@ -317,9 +317,9 @@ See below for some more details on PTP.
 Now enable and start `chrony`:
 
 ```
-# Note: Some distributions use `chrony` instead of `chronyd`, so replace, if necessary:
-sudo systemctl enable chronyd
-sudo systemctl start chronyd
+# Note: Some distributions use `chronyd` instead of `chrony`, so replace, if necessary:
+sudo systemctl enable chrony
+sudo systemctl start chrony
 ```
 
 Verify that `chrony` started ok with `sudo systemctl status chronyd`. One possible error is a fatal message that `chronyd has been compiled without PPS support`. If that's the case (e.g. Manjaro ARM 64bit), you either need to [compile chrony yourself](https://chrony.tuxfamily.org/doc/2.4/installation.html), [mirror](https://github.com/mlichvar/chrony/blob/master/doc/installation.adoc), or switch to another distri.
@@ -463,6 +463,8 @@ Interesting information is for example:
 - `precision: (5.9e-08)`
 
 ### Raspberry Pi 5 and the PTP precision time protocol via ethernet
+
+> **Note:** The PTP precision time protocol (IEEE 1588) is of limited use for home networks, it requires that every component (server, network switch, client) have hardware support for IEEE 1588 which is not the case for most consumer hardware. You cannot use PTP if a single component does not support it.
 
 You can verify that hardware timestamping is active by executing `sudo systemctl status chrony` right after start of chrony. You should see something like:
 
