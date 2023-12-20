@@ -9,12 +9,19 @@ Stratum-1 NTP time server with Raspberry Pi, GPS and Chrony:
 
 ## Requirements - Hardware
 
-* Raspberry Pi
+- Raspberry Pi
 
 While you can use any model of Raspberry Pi to implement a Stratum-1 NTP server with GPS, the best choice
-is Raspberry Pi 4, due to 1Gbit network interface and fast hardware for lowest possible latencies
+is Raspberry Pi 4, due to 1Gbit network interface and fast hardware for lowest possible latencies.
 
-* GPS module
+  - Using a Raspberry Pi 5 gives two additional advantages:
+
+    - Support for the inbuilt hardware real time clock (RTC) that comes with the Raspberry Pi 5
+    - Support for the PTP protocol, which allows to transmit precision time information via ethernet hardware
+
+Both options are documented below (`chrony` configuration)
+
+- GPS module
 
   * Adafruit GPS hat: [Adafruit ultimate GPS hat](https://www.adafruit.com/product/2324)
   * GPS module with serial output and PPS signal: [Adafruit GPS module](https://www.adafruit.com/product/746)
@@ -449,9 +456,10 @@ Optionally, you can use [this sub-project to a status display to the Raspberry P
 
 ## History
 
-* 2023-07-11: Documentation fixes (thx. @glenne), see [#4](https://github.com/domschl/RaspberryNtpServer/issues/4) for details. Mirror links for `chrony` added.
-* 2023-02-24: Added information by @cvonderstein on initial `offset 0.01` and `udev` rules, see [#1](https://github.com/domschl/RaspberryNtpServer/issues/1) for details.
-* 2023-01-09: Code for 4x20 LCD display for NTP server PPS state added.
+- 2023-12-20: Raspberry 5 and suport for RTC and PTP.
+- 2023-07-11: Documentation fixes (thx. @glenne), see [#4](https://github.com/domschl/RaspberryNtpServer/issues/4) for details. Mirror links for `chrony` added.
+- 2023-02-24: Added information by @cvonderstein on initial `offset 0.01` and `udev` rules, see [#1](https://github.com/domschl/RaspberryNtpServer/issues/1) for details.
+- 2023-01-09: Code for 4x20 LCD display for NTP server PPS state added.
 
 ### References
 
