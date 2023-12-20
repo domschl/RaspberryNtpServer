@@ -478,7 +478,7 @@ Dec 20 15:17:15 chronotron chronyd[9525]: chronyd version 4.3 starting (+CMDMON 
 Dec 20 15:17:15 chronotron chronyd[9525]: Enabled HW timestamping on eth0
 ```
 
-To verify if a chrony client of server can support the PTP protocol, use:
+To verify if a chrony client or server can support the PTP protocol, use:
 
 ```bash
 ethtool -T eth0
