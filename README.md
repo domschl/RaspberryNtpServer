@@ -160,7 +160,6 @@ Edit `/etc/default/gpsd`:
 For serial connections (use your device name as tested above):
 
 ```
-START_DAEMON="true"
 GPSD_OPTIONS="-n -G"
 DEVICES="/dev/ttyS0"
 USBAUTO="false"
@@ -169,7 +168,6 @@ USBAUTO="false"
 For USB connections (again use your actual device name):
 
 ```
-START_DAEMON="true"
 GPSD_OPTIONS="-n"
 DEVICES="/dev/ttyACM0"
 USBAUTO="true"
@@ -233,6 +231,8 @@ Some linux distribution only allow `root` to read or access `/dev/pps0`. This is
 
 ### Timeouts with Raspberry Pi OS 64-bit 2023-03 onwards
 
+**Note:** This problem seems to be fixed with current Raspberry Pi OS 'bookworm' releases (2023-12 status).
+
 `sudo ppstest /dev/pps0` yields:
 
 ```
@@ -251,6 +251,8 @@ The 64-bit variant of Raspberry Pi OS has introduced a bug into the PPS handling
 
 > **Note:** Before you setup `chrony`, make sure you completed `gpsd` configuration and that `gpsd` is running ok, and that you have a valid PPS signal at `/dev/pps0`.
 
+> **Note:** Especially when using Raspberry Pi 5 (with new features PTP and RTC), it is recommended to use the standard Raspberry Pi OS, which comes with a chrony version, that is aware of the Raspberry Pi hardware.
+
 Recent chronyd versions drop root privilege after start (check for the `-u` option in `chronyd.service` to see the user that will be used to run `chronyd`). If `/dev/pps0` is not accessible for that user, pps won't work. There are two solutions: either use a version of chronyd that doesn't drop privileges and runs as root, or setup a `udev` rule that allows access to `/dev/pps0` for the process-user of `chronyd`.
 
 If you [compile](https://chrony.tuxfamily.org/doc/3.5/installation.html), [mirror](https://github.com/mlichvar/chrony/blob/master/doc/installation.adoc) `chrony` yourself, there is an option `--disable-privdrop` for `configure`. See `configure -h` for all options for building `chrony`.
@@ -259,7 +261,7 @@ If you [compile](https://chrony.tuxfamily.org/doc/3.5/installation.html), [mirro
 
 Udev rules are tricky and depend on the user of the `chronyd` process and the type of connection your are using.
 
-Create a file `/etc/udev/rules.d/pps-sources.rules` starting with this example, which you will need to modify to your configuration:
+Create a file `/etc/udev/rules.d/pps-sources.rules` starting with this example (which works with Raspberry Pi OS), which you will need to modify to your configuration:
 
 ```
 KERNEL=="pps0", OWNER="root", GROUP="_chrony", MODE="0660"
@@ -291,6 +293,26 @@ refclock SHM 0 refid GPS precision 1e-1 offset 0.01 delay 0.2 noselect
 > **Note:** For recent `chrony` versions, an offset of `0.0` seems to prevent GPS sync, hence set it to `offset 0.01` (or any small, non-zero value) for start. See below, how to get the actual correct `offset` value.
 
 This uses a shared memory device `SHM` to get unprecise time information from GPSD (low precision, marked as `noselect`, so that chrony doesn't try to sync to serial time data). This unprecise time information is then synchronised with the much more precise PPS signal.
+
+#### Additional Raspberry Pi 5 features
+
+Verify that `chrony.conf` contains the following line (standard in Raspberry Pi OS version):
+
+```
+# This directive enables kernel synchronisation (every 11 minutes) of the
+# real-time clock. Note that it can't be used along with the 'rtcfile' directive.
+rtcsync
+```
+
+If you want to transmit PTP hardware timestamps via ethernet, add:
+
+```
+hwtimestamp *
+```
+
+See below for some more details on PTP.
+
+#### All version, continued
 
 Now enable and start `chrony`:
 
@@ -439,6 +461,44 @@ Interesting information is for example:
 
 - `ref: xx.. ("PPS")`
 - `precision: (5.9e-08)`
+
+### Raspberry Pi 5 and the PTP precision time protocol via ethernet
+
+You can verify that hardware timestamping is active by executing `sudo systemctl status chrony` right after start of chrony. You should see something like:
+
+```
+Dec 20 15:17:15 chronotron chronyd[9525]: chronyd version 4.3 starting (+CMDMON +NTP +REFCLOCK +RTC +PRIVDROP +SCFILTER +SIGND +ASYNCDNS +NTS +SECHASH +IPV6 -DEBUG)
+Dec 20 15:17:15 chronotron chronyd[9525]: Enabled HW timestamping on eth0
+```
+
+To verify if a chrony client of server can support the PTP protocol, use:
+
+```bash
+ethtool -T eth0
+```
+
+You should see something like:
+
+```
+Time stamping parameters for eth0:
+Capabilities:
+        hardware-transmit
+        software-transmit
+        hardware-receive
+        software-receive
+        software-system-clock
+        hardware-raw-clock
+PTP Hardware Clock: 0
+Hardware Transmit Timestamp Modes:
+        off
+        on
+        onestep-sync
+Hardware Receive Filter Modes:
+        none
+        all
+```
+
+Required are the `hardware-transmit` and `hardware-receive` options.
 
 ### Further optimizations in `chrony.conf`
 
