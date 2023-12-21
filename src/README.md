@@ -52,8 +52,8 @@ Install with:
 ```bash
 # should be already installed:
 sudo apt install python3-smbus
-# You need at least version 0.3.0 of gpsd-py3 with `--:
-pip install --break-system-packages gpsd-py3
+# You need at least version 0.3.0 of gpsd-py3, otherwise number of satellites is not supported
+sudo pip install --break-system-packages gpsd-py3
 ```
 
 ### Prep variant 2 - Use proper Python virtual environments for installations, avoiding `--break-system-packages`
@@ -72,12 +72,13 @@ chown -R $USER:$USER chronotron
 cd chronotron
 # activate the virtual environment, which allows to install pip modules into it.
 source bin/activate
+# No root!
 pip install smbus gpsd-py3
 ```
 
 Now, while the venv is active, you have access to the packages installed within it. You can deactivate a venv with `deactivate` and re-activate it again with `source bin/activate` while being in the `/opt/chronotron` directory.
 
-When using systemd use the `chronotron_venv.service`, (rename to `chronotron.service). This uses the python of the chronotron venv we just created. 
+When using systemd use the `chronotron_venv.service`, (rename to `chronotron.service`). This uses the python version of the chronotron venv we just created. 
 
 ## Installation of chronotron software
 
@@ -95,12 +96,12 @@ cd RaspberryNtpServer/src
 mkdir /opt/chronotron
 chown -R $USER:$USER /opt/chronotron
 # Now copy:
-cp button.py chronotron.py i2c_lcd_py /opt/chronotron
+cp button.py chronotron.py i2c_lcd.py /opt/chronotron
 ```
 
 2. Install the systemd service
 
-- If you did not use a virtual environment, use `chronotron.service`:
+- If you did not use a python virtual environment, use `chronotron.service`:
 
 ```bash
 # no venv
@@ -114,7 +115,7 @@ sudo cp chronotron.service /etc/systemd/system
 sudo cp chronotron_venv.service /etc/systemd/system/chronotron.service
 ```
 
-While the venv is active, check with `which python` that the path to the venv's python matches the configuration of your systemd file, the line `ExecStart=/opt/chronotron/bin/python /opt/chronotron/chronotron.py` should use the python from within the venv, which automatically activate the venv when the service is started.
+While the venv is active, check with `which python` that the path to the venv's python matches the configuration of your systemd file, the line `ExecStart=/opt/chronotron/bin/python /opt/chronotron/chronotron.py` should use the python from within the venv, which automatically activates the venv when the service is started.
 
 3. Both variants
 
