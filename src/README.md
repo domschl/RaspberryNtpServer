@@ -166,11 +166,12 @@ Notice the path for python: in case of venv, we use the venv's python version.
 <img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd-notes.jpg" align="right" width="600" />
 
 1. Time and date according to NTP
-2. Shows the output of `chronyc tracking`, entry `system time`, the time difference to the NTP reference (see below for further information). **Change note** additionally, instead of `NTP:` the current stratum level is now displayed like `S[1]` for stratum level 1. 
-3. `L[ ]` no lock, `L[*]` lock. A lock (`*`) indicates that time synchronisation is established, either via remote NTP servers or GPS + PPS
-4. `PPS` signales that the lock is active using GPS and PPS, the server is in high-precision stratum 1 mode. If instead a hostname is displayed, then PPS is NOT active, and the network is used for time synchronisation, resulting in lower precision.
-5. `SAT[nn]`, `nn` is the number of satellites that are actively used for time synchronisation.
-6. Shows output of `chronyc sources`, the last column of the currently active source, which is the estimated error (see below for further information)
+2.  **New:** The current stratum level is displayed as `S[1]` for stratum level 1. 
+3. Shows the output of `chronyc tracking`, entry `system time`, the time difference to the NTP reference (see below for further information).
+4. `L[ ]` no lock, `L[*]` lock. A lock (`*`) indicates that time synchronisation is established, either via remote NTP servers or GPS + PPS
+5. `PPS` signales that the lock is active using GPS and PPS, the server is in high-precision stratum 1 mode. If instead a hostname is displayed, then PPS is NOT active, and the network is used for time synchronisation, resulting in lower precision.
+6. `SAT[nn]`, `nn` is the number of satellites that are actively used for time synchronisation.
+7. Shows output of `chronyc sources`, the last column, "adjusted offset", of the currently active source, which is the estimated error (see below for further information)
 
 ### Further information and references
 
