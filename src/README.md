@@ -142,6 +142,15 @@ Dec 21 09:38:37 chronotron chronotron.py[2628]: INFO:Chronotron:Chrony stratum l
 Dec 21 09:38:37 chronotron chronotron.py[2628]: INFO:Chronotron:Chrony locked to high precision GPS PPS signal
 ```
 
+Note: if you are using a chronotron virtual python environment (venv) it should look like this:
+
+```
+CGroup: /system.slice/chronotron.service
+             └─8197 /opt/chronotron/bin/python /opt/chronotron/chronotron.py
+```
+
+Notice the path for python: in case of venv, we use the venv's python version.
+
 ## Notes on the display-information
 
 <img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd-notes.jpg" align="right" width="600" />
