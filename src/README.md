@@ -36,32 +36,79 @@ Old Raspis use `sm_bus=0`.
 
 This project uses Martijn Braam's python gpsd driver <https://github.com/MartijnBraam/gpsd-py3> (minimum version `0.3.0`, and `smbus` (already available on some distributions).
 
-Please check first, if either of those packages are available via your linux package manager. 
+With recent python and Raspberry Pi OS updates, installation became a bit more complicated, since it is no longer easily allowed to install PIP modules into the root context.
+There are two solutions
 
-If not, they can be installed with:
+### Slightly improper shortcut `--break-system-packages`
+
+> **Note:** there is a proper way to do things, see next chapter using `venv`
+
+We simply force installation of gpsd-py3 into root context, which is bad practice, but in our case of limited risk, since gpsd-py3 has no further dependencies and is not part of any package manager.
 
 Install with:
 
 ```bash
-# You need at least version 0.3.0 of gpsd-py3:
-pip install gpsd-py3
-# If smbus is not available, install with:
-pip install smbus
-# Note: if the chronotron.service runs as root (default), you need instead install as sudo:
-sudo pip install gpsd-py3 smbus
-# (This is not recommended and may generate conflicts with your package manager, so first check, if
-# either gpsd-py3 or smbus are available as python packages with your default package manager!)
+# should be already installed:
+sudo apt install python3-smbus
+# You need at least version 0.3.0 of gpsd-py3 with `--:
+pip install --break-system-packages gpsd-py3
 ```
 
-Currently, a number of distributions is changing to Python 3.11. After each Python-update, you'll need to
-reinstall the required packages! 
+### Use Python virtual environments for installations, avoiding `--break-system-packages`
+
+The proper way to install is to create a virtual environment for chronotron:
 
 If `chronotron` does not start, check with `sudo systemctl status chronotron`: It will show if it can't 
 import a required packages.
 
-## Installation
+```bash
+cd /opt
+# create a virtual env at /opt/chronotron
+sudo python -m venv chronotron
+# make the directory tree /opt/chronotron accessible for your current user
+chown -R $USER:$USER chronotron
+cd chronotron
+# activate the virtual environment, which allows to install pip modules into it.
+source bin/activate
+pip install smbus gpsd-py3
+```
 
-Copy the python files to `/opt/chronotron`, and the `service` file to `/etc/systemd/system`.
+Now, while the venv is active, you have access to the packages installed within it. You can deactivate a venv with `deactivate` and re-activate it again with `source bin/activate` while being in the `/opt/chronotron` directory.
+
+When using systemd use the `chronotron_venv.service`, (rename to `chronotron.service). This uses the python of the chronotron venv we just created. 
+
+## Installation of chronotron software
+
+1. Copy the python files to `/opt/chronotron`:
+
+```bash
+# Skip directory creation, if you have already created a chronotron venv
+mkdir /opt/chronotron
+chown -R $USER:$USER /opt/chronotron
+# Now copy:
+cp button.py chronotron.py i2c_lcd_py /opt/chronotron
+```
+
+2. Install the systemd service
+
+- If you did not use a virtual environment, use `chronotron.service`:
+
+```bash
+# no venv
+sudo cp chronotron.service /etc/systemd/system
+```
+
+- If you used a virtual environment:
+
+```bash
+# with chronotron venv
+sudo cp chronotron_venv.service /etc/systemd/system
+```
+
+While the venv is active, check with `which python` that the path to the venv's python matches the configuration of your systemd file, the line `ExecStart=/opt/chronotron/bin/python /opt/chronotron/chronotron.py` should use the python from within the venv, which automatically activate the venv when the service is started.
+
+3. Both variants
+
 Enable the systemd server `chronotron` with:
 
 ```bash
