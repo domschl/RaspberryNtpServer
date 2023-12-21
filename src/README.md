@@ -87,7 +87,12 @@ chronotron.service - Display chrony statistics on 4x20 LCD
      CGroup: /system.slice/chronotron.service
              └─370 /usr/bin/python /opt/chronotron/chronotron.py
 
-Oct 25 14:44:17 chronotron systemd[1]: Started Display chrony statistics on 4x20 LCD.
+Dec 21 09:38:37 chronotron systemd[1]: Started chronotron.service - Display chrony statistics on 4x20 LCD.
+Dec 21 09:38:37 chronotron chronotron.py[2628]: INFO:Chronotron:Chronotron version 2.0.0 starting
+Dec 21 09:38:37 chronotron chronotron.py[2628]: INFO:Chronotron:Chrony aquired lock to time source
+Dec 21 09:38:37 chronotron chronotron.py[2628]: INFO:Chronotron:Chrony receiving time source from PPS
+Dec 21 09:38:37 chronotron chronotron.py[2628]: INFO:Chronotron:Chrony stratum level changed to 1
+Dec 21 09:38:37 chronotron chronotron.py[2628]: INFO:Chronotron:Chrony locked to high precision GPS PPS signal
 ```
 
 ## Notes on the display-information
@@ -95,7 +100,7 @@ Oct 25 14:44:17 chronotron systemd[1]: Started Display chrony statistics on 4x20
 <img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd-notes.jpg" align="right" width="600" />
 
 1. Time and date according to NTP
-2. Shows the output of `chronyc tracking`, entry `system time`, the time difference to the NTP reference (see below for further information).
+2. Shows the output of `chronyc tracking`, entry `system time`, the time difference to the NTP reference (see below for further information). **Change note** additionally, instead of `NTP:` the current stratum level is now displayed like `S[1]` for stratum level 1. 
 3. `L[ ]` no lock, `L[*]` lock. A lock (`*`) indicates that time synchronisation is established, either via remote NTP servers or GPS + PPS
 4. `PPS` signales that the lock is active using GPS and PPS, the server is in high-precision stratum 1 mode. If instead a hostname is displayed, then PPS is NOT active, and the network is used for time synchronisation, resulting in lower precision.
 5. `SAT[nn]`, `nn` is the number of satellites that are actively used for time synchronisation.

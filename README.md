@@ -578,6 +578,7 @@ Optionally, you can use [this sub-project to a status display to the Raspberry P
 
 ## History
 
+- 2023-12-21: Cleanup for the display software, display current stratum level (thanks @Lefuneste83, see [#7](https://github.com/domschl/RaspberryNtpServer/issues/7)), implemented logging.
 - 2023-12-20: Raspberry 5 and suport for RTC and PTP precision time protocol how-tos.
 - 2023-07-11: Documentation fixes (thx. @glenne), see [#4](https://github.com/domschl/RaspberryNtpServer/issues/4) for details. Mirror links for `chrony` added.
 - 2023-02-24: Added information by @cvonderstein on initial `offset 0.01` and `udev` rules, see [#1](https://github.com/domschl/RaspberryNtpServer/issues/1) for details.
