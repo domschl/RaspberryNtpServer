@@ -34,7 +34,7 @@ Old Raspis use `sm_bus=0`.
 
 ## Software requirements
 
-> **Note:** Standard Raspberry Pi OS (tested with 'Bookworm') is recommened and used below
+> **Note:** Standard Raspberry Pi OS (tested with 'Bookworm') is recommended and used below
 
 This project uses Martijn Braam's python gpsd driver <https://github.com/MartijnBraam/gpsd-py3> (minimum version `0.3.0`, and `smbus` (already available on some distributions).
 
