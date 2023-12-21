@@ -2,11 +2,14 @@
 
 Stratum-1 NTP time server with Raspberry Pi, GPS and Chrony: 
 
-<img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd.jpg" align="right" width="300" />
-
 - how to build a precision time server.
 - (optional) [how to add a 4x20 LCD to display](src) server status and GPS and PPS information.
 
+
+<div align="right">
+<img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd.jpg" width="300" /><br>
+<em>Optional display shows PPS lock</em>
+</div>
 ## Requirements - Hardware
 
 - Raspberry Pi
@@ -330,10 +333,11 @@ sudo systemctl start chrony
 
 Verify that `chrony` started ok with `sudo systemctl status chronyd`. One possible error is a fatal message that `chronyd has been compiled without PPS support`. If that's the case (e.g. Manjaro ARM 64bit), you either need to [compile chrony yourself](https://chrony.tuxfamily.org/doc/2.4/installation.html), [mirror](https://github.com/mlichvar/chrony/blob/master/doc/installation.adoc), or switch to another distri.
 
-<img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd-slow.jpg" align="right" width="300" />
-
 Then start the chrony console with `chronyc`. At the `chronyc>` prompt, enter:
-
+<div align="right">
+<img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd-slow.jpg" width="300" /><br>
+<em>Before PPS lock, stratum 3</em>
+</div>
 `sources`:
 
 ```
@@ -376,9 +380,10 @@ Wait a few minutes for the offset to stabilize, note it's value, and edit `/etc/
 refclock PPS /dev/pps0 lock GPS
 refclock SHM 0 refid GPS precision 1e-1 offset 0.512 delay 0.2 noselect
 ```
-
-<img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd.jpg" align="right" width="300" />
-
+<div align="right">
+<img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd.jpg" width="300" /><br>
+<em>After PPS lock, stratum 1</em>
+</div>
 > **Note:** A value of `offset 0.0` seems to prevent synchronisation for some versions of chrony, so use some small non-zero value instead, if a value close to 0 is required for your installation.
 
 Restart `chrony` with `sudo systemctl restart chronyd`, and check `chronyc` again:
