@@ -1,11 +1,20 @@
 import time
+import logging
 import smbus
 import copy
 
 
 class LcdDisplay:
     def __init__(self, sm_bus=1, i2c_addr=0x27, cols=20, rows=4):
-        self.bus = smbus.SMBus(sm_bus)  # Rev 1 Pi: 0, Rev 2 Pi: 1
+        self.log = logging.getLogger("LcdDisplay")
+        try:
+            self.bus = smbus.SMBus(sm_bus)  # Rev 1 Pi: 0, Rev 2 Pi: 1
+            self.active = True
+        except Exception as e:
+            self.log.error(f"Cannot open LCD on I2C bus: {e}")
+            self.active = False
+            return
+
         self.i2c_addr = i2c_addr
         self.cols = cols
         self.rows = rows
@@ -31,14 +40,20 @@ class LcdDisplay:
         self.screen_buf = [[" " for _ in range(cols)] for _ in range(rows)]
         self.cur_row = 0
         self.cur_col = 0
+        self.log.debug("LCD display initialized.")
 
     def set_backlight(self, state):
+        if self.active is False:
+            return
         if state:
             self.backlight = 0x08
         else:
             self.backlight = 0x00
 
     def write(self, byte, data_type):
+        if self.active is False:
+            return
+
         hi_byte = data_type | (byte & 0xF0) | self.backlight
         lo_byte = data_type | ((byte << 4) & 0xF0) | self.backlight
 
@@ -57,12 +72,16 @@ class LcdDisplay:
         time.sleep(self.delay)
 
     def write_row(self, row):
+        if self.active is False:
+            return
         ra = self.line_cmds[row]
         self.write(ra, self.type_command)
         for i in range(self.cols):
             self.write(ord(self.screen_buf[row][i]), self.type_data)
 
     def print_row(self, row, text):
+        if self.active is False:
+            return
         if row < 0:
             row = 0
         if row >= self.rows:
@@ -72,6 +91,8 @@ class LcdDisplay:
         self.write_row(row)
 
     def print_at(self, row, col, text):
+        if self.active is False:
+            return
         if row < 0 or row > self.rows - 1:
             row = 0
         if col < 0 or col > self.cols - 1:
@@ -82,6 +103,8 @@ class LcdDisplay:
         self.write_row(row)
 
     def scroll(self, n=1):
+        if self.active is False:
+            return
         for _ in range(n):
             for r in range(self.rows - 1):
                 self.screen_buf[r] = copy.copy(self.screen_buf[r + 1])
@@ -93,6 +116,8 @@ class LcdDisplay:
             self.cur_row = self.cur_row - 1
 
     def print(self, text):
+        if self.active is False:
+            return
         if len(text) + self.cur_col > self.cols:
             ctext = text[: self.cols - self.cur_col]
             rtext = text[self.cols - self.cur_col :]
@@ -114,10 +139,11 @@ class LcdDisplay:
 
 if __name__ == "__main__":
     lcd = LcdDisplay(1, 0x27, 20, 4)
-    # lcd.print_row(0,"Chronotron 0.1")
-    # lcd.print_row(1,"  >")
-    # for i in range(60):
-    #     lcd.print(f"{i} ")
-    lcd.print(
-        "Hello! That is a hell of a lot of text that we are going to display on this tiny screen. However there is always a way to present information in a way that is helpful, even under contrained conditions."
-    )
+    if lcd.active is True:
+        lcd.print(
+            "Hello! That is a hell of a lot of text that we are going to display on this tiny screen. However there is always a way to present information in a way that is helpful, even under contrained conditions."
+        )
+        exit(0)
+    else:
+        print("Failed to initialize display")
+        exit(-1)

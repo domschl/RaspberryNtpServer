@@ -148,7 +148,11 @@ def main_loop():
 
     # bt = Button([(27, "blue", select_button), (22, "black", main_button)])
 
-    lcd = LcdDisplay()
+    lcd = LcdDisplay(sm_bus=1, i2c_addr=0x27, cols=20, rows=4)
+    if lcd.active is False:
+        log.error("Failed to open display, exiting...")
+        exit(-1)
+
     while True:
         time_str = time.strftime("%Y-%m-%d  %H:%M:%S")
         if time_str != last_time:
