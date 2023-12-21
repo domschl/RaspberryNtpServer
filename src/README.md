@@ -79,7 +79,14 @@ When using systemd use the `chronotron_venv.service`, (rename to `chronotron.ser
 
 ## Installation of chronotron software
 
-1. Copy the python files to `/opt/chronotron`:
+0. Clone the repository
+
+```bash
+git clone https://github.com/domschl/RaspberryNtpServer
+cd RaspberryNtpServer/src
+```
+
+2. Copy the python files to `/opt/chronotron`:
 
 ```bash
 # Skip directory creation, if you have already created a chronotron venv
@@ -98,11 +105,11 @@ cp button.py chronotron.py i2c_lcd_py /opt/chronotron
 sudo cp chronotron.service /etc/systemd/system
 ```
 
-- If you used a virtual environment:
+- If you used a virtual environment, use `chronotron_venv.service` and rename it:
 
 ```bash
 # with chronotron venv
-sudo cp chronotron_venv.service /etc/systemd/system
+sudo cp chronotron_venv.service /etc/systemd/system/chronotron.service
 ```
 
 While the venv is active, check with `which python` that the path to the venv's python matches the configuration of your systemd file, the line `ExecStart=/opt/chronotron/bin/python /opt/chronotron/chronotron.py` should use the python from within the venv, which automatically activate the venv when the service is started.
