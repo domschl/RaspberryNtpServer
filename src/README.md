@@ -1,10 +1,10 @@
 # Simple 4x20 LCD display for Raspberry Pi NTP Server
 
-The display shows current NTP time and date, the PPS signal locking state, the offset to the NTP time, the number of satellites that are currently used, and, if no PPS lock is available, alternatively the address of the time server used.
+The display shows current NTP time and date, the PPS signal locking state, Stratum level, the offset to the NTP time, the number of satellites that are currently used, and, if no PPS lock is available, alternatively the address of the time server used.
 
 If you see an address of some time server, PPS lock is not (yet) working.
 
-Note: Review [this line](https://github.com/domschl/RaspberryNtpServer/blob/c42218ec63e34c5db5b6ec6da0f1ef79b525e863/src/chronotron.py#L119) which switches off the backlight during night-time.
+Note: the main script `chronotron.py` defines a `start_time` and an `end_time`, used to switch on the LCD backlight (at `start_time`) and switch it off at (`end_time`). If you want permanent backlight, simply set `start_time` and `end_time` to `None`.
 
 ## Hardware requirements
 
