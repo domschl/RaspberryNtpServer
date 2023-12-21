@@ -118,7 +118,7 @@ def main_loop():
     main_states = 2
     old_lock = False
     old_pps = False
-    old_stratum = -1
+    old_stratum = None
     old_src = None
 
     version = "2.0.0"
@@ -184,7 +184,7 @@ def main_loop():
             if old_stratum != stats["stratum"]:
                 old_stratum = stats["stratum"]
                 if old_stratum is None:
-                    strat = "undefined"
+                    strat = "?"
                 else:
                     strat = old_stratum
                 log.info(f"Chrony stratum level changed to {old_stratum}")
