@@ -330,6 +330,8 @@ sudo systemctl start chrony
 
 Verify that `chrony` started ok with `sudo systemctl status chronyd`. One possible error is a fatal message that `chronyd has been compiled without PPS support`. If that's the case (e.g. Manjaro ARM 64bit), you either need to [compile chrony yourself](https://chrony.tuxfamily.org/doc/2.4/installation.html), [mirror](https://github.com/mlichvar/chrony/blob/master/doc/installation.adoc), or switch to another distri.
 
+<img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd-slow.jpg" align="right" width="300" />
+
 Then start the chrony console with `chronyc`. At the `chronyc>` prompt, enter:
 
 `sources`:
@@ -374,6 +376,8 @@ Wait a few minutes for the offset to stabilize, note it's value, and edit `/etc/
 refclock PPS /dev/pps0 lock GPS
 refclock SHM 0 refid GPS precision 1e-1 offset 0.512 delay 0.2 noselect
 ```
+
+<img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd.jpg" align="right" width="300" />
 
 > **Note:** A value of `offset 0.0` seems to prevent synchronisation for some versions of chrony, so use some small non-zero value instead, if a value close to 0 is required for your installation.
 
