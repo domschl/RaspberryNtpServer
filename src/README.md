@@ -39,11 +39,11 @@ This project uses Martijn Braam's python gpsd driver <https://github.com/Martijn
 With recent python and Raspberry Pi OS updates, installation became a bit more complicated, since it is no longer easily allowed to install PIP modules into the root context.
 There are two solutions
 
-### Slightly improper shortcut `--break-system-packages`
+### Prep variant 1 - Slightly improper shortcut `--break-system-packages`
 
 > **Note:** there is a proper way to do things, see next chapter using `venv`
 
-We simply force installation of gpsd-py3 into root context, which is bad practice, but in our case of limited risk, since gpsd-py3 has no further dependencies and is not part of any package manager.
+If you want to avoid working with Python virtual environments (e.g because the Raspberry is simply a single-use time server), you can simply force installation of gpsd-py3 into root context, which is generally considered bad practice, but in our case of limited risk, since gpsd-py3 has no further dependencies and is not part of any package manager.
 
 Install with:
 
@@ -54,7 +54,7 @@ sudo apt install python3-smbus
 pip install --break-system-packages gpsd-py3
 ```
 
-### Use Python virtual environments for installations, avoiding `--break-system-packages`
+### Prep variant 2 - Use proper Python virtual environments for installations, avoiding `--break-system-packages`
 
 The proper way to install is to create a virtual environment for chronotron:
 
