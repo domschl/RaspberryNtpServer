@@ -30,9 +30,11 @@ lcd = LcdDisplay(sm_bus=1, i2c_addr=0x27, cols=20, rows=4)
 
 Old Raspis use `sm_bus=0`.
 
-> **Note:** if the LCD screen looks inverted or too faint, use the potentiometer on the adapter-board to adjust the contrast.
+> **Note:** if the LCD screen looks inverted or too faint, or no output is visible at all, use the potentiometer on the adapter-board to adjust the contrast.
 
 ## Software requirements
+
+> **Note:** Standard Raspberry Pi OS (tested with 'Bookworm') is recommened and used below
 
 This project uses Martijn Braam's python gpsd driver <https://github.com/MartijnBraam/gpsd-py3> (minimum version `0.3.0`, and `smbus` (already available on some distributions).
 
