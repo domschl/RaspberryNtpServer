@@ -10,6 +10,7 @@ Stratum-1 NTP time server with Raspberry Pi, GPS and Chrony:
 <img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd.jpg" width="300" /><br>
 <em>Optional display shows PPS lock</em>
 </div>
+
 ## Requirements - Hardware
 
 - Raspberry Pi
