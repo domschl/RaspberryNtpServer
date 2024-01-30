@@ -252,10 +252,7 @@ source 0 - assert 1679340614.003464678, sequence: 84623 - clear  0.000000000, se
 time_pps_fetch() error -1 (Connection timed out)
 ```
 
-The 64-bit variant of Raspberry Pi OS has introduced a bug into the PPS handling via `i2c-bcm2835` kernel driver. See issue [6](https://github.com/domschl/RaspberryNtpServer/issues/6) for the ongoing discussion. So far there seem to be two options:
-
-- Switch to 32-bit kernel (by settings `arm_64bit=0` in `/boot/config.txt`)
-- Update to the latest kernel via `sudo rpi-update`. Make sure to read [Issue 6](https://github.com/domschl/RaspberryNtpServer/issues/6) discussion before proceeding.
+See issue [6](https://github.com/domschl/RaspberryNtpServer/issues/6) for the ongoing discussion.
 
 ## Setting up Chrony as time-server
 
