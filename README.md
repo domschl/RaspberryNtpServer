@@ -382,6 +382,7 @@ refclock SHM 0 refid GPS precision 1e-1 offset 0.512 delay 0.2 noselect
 <img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd.jpg" width="300" /><br>
 <em>After PPS lock, stratum 1</em>
 </div>
+
 > **Note:** A value of `offset 0.0` seems to prevent synchronisation for some versions of chrony, so use some small non-zero value instead, if a value close to 0 is required for your installation.
 
 Restart `chrony` with `sudo systemctl restart chronyd`, and check `chronyc` again:
