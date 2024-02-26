@@ -332,11 +332,8 @@ sudo systemctl start chrony
 Verify that `chrony` started ok with `sudo systemctl status chronyd`. One possible error is a fatal message that `chronyd has been compiled without PPS support`. If that's the case (e.g. Manjaro ARM 64bit), you either need to [compile chrony yourself](https://chrony.tuxfamily.org/doc/2.4/installation.html), [mirror](https://github.com/mlichvar/chrony/blob/master/doc/installation.adoc), or switch to another distri.
 
 Then start the chrony console with `chronyc`. At the `chronyc>` prompt, enter:
-<div align="right">
-<img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd-slow.jpg" width="300" /><br>
-<em>Before PPS lock, stratum 3</em>
-</div>
-`sources`:
+
+`sources`
 
 ```
 chronyc> sources
@@ -351,6 +348,11 @@ MS Name/IP address         Stratum Poll Reach LastRx Last sample
 ^- ntp2.hetzner.de               2  10   377    59   -411us[ -411us] +/-   32ms
 chronyc> 
 ```
+
+<div align="right">
+<img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd-slow.jpg" width="300" /><br>
+<em>Before PPS lock, stratum 3</em>
+</div>
 
 If all went well, you should see a `PPS` device marked with `#*`, indicating the active time source. Error should be in nanosecond range (`-138ns[ -108ns] +/-  120ns`). `#?` indicates an unusable time source, `^-` a usable but unused source.
 
@@ -378,6 +380,7 @@ Wait a few minutes for the offset to stabilize, note it's value, and edit `/etc/
 refclock PPS /dev/pps0 lock GPS
 refclock SHM 0 refid GPS precision 1e-1 offset 0.512 delay 0.2 noselect
 ```
+
 <div align="right">
 <img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd.jpg" width="300" /><br>
 <em>After PPS lock, stratum 1</em>
