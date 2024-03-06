@@ -139,10 +139,12 @@ Older versions of `raspi-config` hide the same serial options under "Advanced op
 
 ##### Other linux distributions and manual configuration
 
-1. Edit `/boot/cmdline.txt` and remove references to the serial port `ttyAMA0`. E.g. remove: `console=ttyAMA0,115200` and (if present) `kgdboc=ttyAMA0,115200`.
+> **Note:** Recent Raspberry Pi OS has __moved__ the location of kernel config files from `/boot/` to `/boot/firmware/`. Adapt the following paths according to your OS version (If moved, a note is left at the old `/boot/` location.
+
+1. Edit `/boot/firmware/cmdline.txt` and remove references to the serial port `ttyAMA0`. E.g. remove: `console=ttyAMA0,115200` and (if present) `kgdboc=ttyAMA0,115200`.
 2. Disable getty on serial port. `sudo systemctl disable getty@ttyAMA0` or, on some Linux distris: `sudo systemctl disable serial-getty@ttyAMA0`
-3. Enable uart in `/boot/config.txt`, add a line `enable_uart=1`
-4. For RPI 3 or later disable bluetooth via overlay, add another line to `/boot/config.txt`: `dtoverlay=pi3-disable-bt-overlay`. In some versions, this is done by *enabling* the overlay `dtoverlay=pi3-miniuart-bt` which disables bluetooth and reestablishes standard serial.
+3. Enable uart in `/boot/firmware/config.txt`, add a line `enable_uart=1`
+4. For RPI 3 or later disable bluetooth via overlay, add another line to `/boot/firmware/config.txt`: `dtoverlay=pi3-disable-bt-overlay`. In some versions, this is done by *enabling* the overlay `dtoverlay=pi3-miniuart-bt` which disables bluetooth and reestablishes standard serial.
 
 See: ["Raspberry Pi 3, 4 and Zero W Serial Port Usage"](https://www.abelectronics.co.uk/kb/article/1035/raspberry-pi-3-serial-port-usage).  
 
@@ -206,7 +208,7 @@ We need to enable a special kernel driver and overlay in order to receive this o
 
 You'll find that `/boot/config.txt` just contains a note that file content has moved to `/boot/firmware/config.txt`. 
 
-1. Edit `/boot/config.txt` and add a line `dtoverlay=pps-gpio,gpiopin=4`. (Editing `cmdline.txt` is no longer necessary)
+1. Edit `/boot/firmware/config.txt` and add a line `dtoverlay=pps-gpio,gpiopin=4`. (Editing `cmdline.txt` is no longer necessary)
 2. Edit `/etc/modules-load.d/raspberrypi.conf` and add two lines with `pps-gpio` and `pps-ldisc`, to load the required kernel modules
 
 ### Older versions of Raspberry Pi OS and other distris
