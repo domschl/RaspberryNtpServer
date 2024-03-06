@@ -200,9 +200,20 @@ The serial or USB connection to the GPS module alone does not allow precise time
 
 This is compensated by the PPS signal that is directly connected to Raspberry PI's GPIO 4 (you can use other GPIO pins, simply adapt this correpondingly below).
 
-We need to enable a special kernel driver and overlay in order to receive this once-per-second GPS synchronised pulse as precisely as possible.
+We need to enable a special kernel driver and overlay in order to receive this once-per-second GPS synchronised pulse as precisely as possible. The location of config files for kernel modules and options has changed recently (2024-03)!jj
 
-1. Edit `/boot/cmdline.txt` and add ` bcm2708.pps_gpio_pin=4` at the end of the line.
+### Current Raspberry Pi OS 'Bookworm' (since 2024-03)
+
+You'll find that `/boot/config.txt` just contains a note that file content has moved to `/boot/firmware/config.txt`. 
+
+1. Edit `/boot/config.txt` and add a line `dtoverlay=pps-gpio,gpiopin=4`. (Editing `cmdline.txt` is no longer necessary)
+2. Edit `/etc/modules-load.d/raspberrypi.conf` and add two lines with `pps-gpio` and `pps-ldisc`, to load the required kernel modules
+
+### Older versions of Raspberry Pi OS and other distris
+
+if your `/boot/config.txt` does __not__ contain a note that content has moved to `/boot/firmware/config.txt`:
+
+1. Edit `/boot/cmdline.txt` and add ` bcm2708.pps_gpio_pin=4` at the end of the line. (Might not be necessary)
 2. Edit `/boot/config.txt` and add a line `dtoverlay=pps-gpio,gpiopin=4`. (Depending on your distri, either 1. or 2. is necessary, but it doesn't seem to hurt to do both).
 3. Edit `/etc/modules-load.d/raspberrypi.conf` and add two lines with `pps-gpio` and `pps-ldisc`, to load the required kernel modules
 
@@ -213,7 +224,7 @@ After a reboot, a new device `/dev/pps0` should exist, and `dmesg` should show s
 [    7.530144] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
 [    7.540372] pps pps0: new PPS source pps@4.-1
 [    7.542012] pps pps0: Registered IRQ 166 as PPS source
-[    7.550775] pps_ldisc: PPS line discipline registered
+[    7.550775] pps_ldisc: PPS line discipl43ine registered
 ```
 
 Now use `ppstest` (you might need to install `pps-utils` or `pps-tools` depending on your distri):
@@ -589,6 +600,7 @@ Optionally, you can use [this sub-project to a status display to the Raspberry P
 
 ## History
 
+- 2024-03-06: Update: location of `/boot/config.txt` has changed to `/boot/firmware/config.txt`. Thanks to @Nebulosa-Cat for the information!
 - 2023-12-21: Cleanup for the display software, display current stratum level (thanks @Lefuneste83, see [#7](https://github.com/domschl/RaspberryNtpServer/issues/7)), implemented logging.
 - 2023-12-20: Raspberry 5 and suport for RTC and PTP precision time protocol how-tos.
 - 2023-07-11: Documentation fixes (thx. @glenne), see [#4](https://github.com/domschl/RaspberryNtpServer/issues/4) for details. Mirror links for `chrony` added.
