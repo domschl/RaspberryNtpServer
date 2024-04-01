@@ -202,7 +202,7 @@ The serial or USB connection to the GPS module alone does not allow precise time
 
 This is compensated by the PPS signal that is directly connected to Raspberry PI's GPIO 4 (you can use other GPIO pins, simply adapt this correpondingly below).
 
-We need to enable a special kernel driver and overlay in order to receive this once-per-second GPS synchronised pulse as precisely as possible. The location of config files for kernel modules and options has changed recently (2024-03)!jj
+We need to enable a special kernel driver and overlay in order to receive this once-per-second GPS synchronised pulse as precisely as possible. The location of config files for kernel modules and options has changed recently (2024-03)!
 
 ### Current Raspberry Pi OS 'Bookworm' (since 2024-03)
 
