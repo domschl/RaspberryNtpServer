@@ -18,10 +18,11 @@ Stratum-1 NTP time server with Raspberry Pi, GPS and Chrony:
 While you can use any model of Raspberry Pi to implement a Stratum-1 NTP server with GPS, the best choice
 is Raspberry Pi 4, due to 1Gbit network interface and fast hardware for lowest possible latencies.
 
-  - Using a Raspberry Pi 5 gives two additional advantages:
+  - Using a Raspberry Pi 5 gives two additional advantages, but has changed the configuration of the serial port.
 
     - Support for the inbuilt hardware real time clock (RTC) that comes with the Raspberry Pi 5
     - Support for the PTP protocol, which allows to transmit precision time information via ethernet hardware
+    - When connecting the GPS receiver via serial port, the new default is not to use the RX, TX pins on the 40pin connector, but the new three-pin UART connector. To use the 40-pin connector a special configuration is needed.
 
 Both options are of limited advantage for most settings: the hardware clock is only useful for providing time during the first few seconds after boot (and if both GPS _and_ network are inaccessible), and PTP is a time standard requiring IEEE1588-enabled hardware everywhere and provides no advantages over NTP/chrony in most settings. Both however are documented below (See `chrony` configuration, PTP-chapter).
 
@@ -30,7 +31,7 @@ Both options are of limited advantage for most settings: the hardware clock is o
   * Adafruit GPS hat: [Adafruit ultimate GPS hat](https://www.adafruit.com/product/2324)
   * GPS module with serial output and PPS signal: [Adafruit GPS module](https://www.adafruit.com/product/746)
   * GPS module with USB, SMA connector and PPS: [Keystudio GPS module](https://wiki.keyestudio.com/KS0319_keyestudio_GPS_Module)
-  * Cheap NEO6 modules: [Aliexpress NEO6](https://www.aliexpress.com/item/32800500501.html?spm=a2g0o.productlist.0.0.2eae3298PesRP8&algo_pvid=89486c29-bfb7-414c-a88d-81a9972f8080&algo_expid=89486c29-bfb7-414c-a88d-81a9972f8080-1&btsid=2100bdd516068129046292696e617f&ws_ab_test=searchweb0_0,searchweb201602_,searchweb201603_)
+  * Cheap NEO6 modules: [Aliexpress NEO6](https://www.aliexpress.com/w/wholesale-neo6.html))
 
 <img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/antenna.jpg" align="right" width="200" height="200" />
   
@@ -73,6 +74,7 @@ Serial connection:
 * All Pi Hats use serial connections.
 * Raspberry serial console needs to be disabled
 * Sometimes, bluetooth needs to be disabled.
+* Raspberry Pi 5 changed the default serial connection to the 3-pin UART connector by default.
 
 ### Recommended setup
 
@@ -89,6 +91,20 @@ NEO6 GPS modules are available at very low cost (1-2Eur) at chinese dealers (Ali
 _Typical wiring between GPS module and Raspberry Pi connector._
 
 > **Note:** If your GPS module is connected via USB, you only need to connect the PPS connector on the GPS module to GPIO 4 on the Raspberry. Power (Vin), Gnd and Tx/Rx are handled via USB.
+
+> **Note:** The Raspberry Pi 5 has a new connector for the serial port that is used by default instead of the Pins RX, TX on the diagram:
+
+#### Raspberry PI 5 serial connection changes
+
+- Either use _new the three-pin UART connector_, which is used by default for serial communication,
+- or reconfigure the serial ports by editing `/boot/firmware/config.txt` and adding the lines:
+
+```
+dtparam=uart0
+dtparam=uart0_console
+```
+
+Documentation for those options is currently in a disarray for Raspberry Pi 5, so some research might be required. See discussion in [#6](https://github.com/domschl/RaspberryNtpServer/issues/6). Also this [video on Raspberry Pi 5 Serial Port](https://www.youtube.com/watch?v=27p4XHE3iyw) usage might be helpful.
 
 ### Test
 
@@ -602,6 +618,7 @@ Optionally, you can use [this sub-project to a status display to the Raspberry P
 
 ## History
 
+- 2024-04-30: Changes to Raspberry Pi 5 serial Port configuration, see [6](https://github.com/domschl/RaspberryNtpServer/issues/6), thanks @aGGreSSiv for figuring out the issue!
 - 2024-03-06: Update: location of `/boot/config.txt` has changed to `/boot/firmware/config.txt`. Thanks to @Nebulosa-Cat for the information!
 - 2023-12-21: Cleanup for the display software, display current stratum level (thanks @Lefuneste83, see [#7](https://github.com/domschl/RaspberryNtpServer/issues/7)), implemented logging.
 - 2023-12-20: Raspberry 5 and suport for RTC and PTP precision time protocol how-tos.
