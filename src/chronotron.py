@@ -107,6 +107,14 @@ def get_statistics(log, host="localhost"):
 
     return stats
 
+def get_ip():
+    ipinfo = exec_cmd(["hostname", "-I"])
+    if ipinfo:
+        ip_addresses = ipinfo[0].strip().split()
+        if ip_addresses:
+            return ip_addresses[0]
+    return "-.-.-.-"
+
 
 def main_loop():
     last_time = ""
@@ -153,6 +161,7 @@ def main_loop():
         log.error("Failed to open display, exiting...")
         exit(-1)
 
+    ip_counter = 0
     while True:
         time_str = time.strftime("%Y-%m-%d  %H:%M:%S")
         if time_str != last_time:
@@ -231,6 +240,10 @@ def main_loop():
             else:
                 dev_str = f"{stats['adjusted_offset']:>7}"
             last_str = f"SATS[{sats}]     {dev_str}"
+            ip_counter += 1
+            if ip_counter % 8 < 4:
+                ip_str = get_ip()
+                source_str = f"IP: {ip_str}" 
             lcd.print_row(0, time_str)
             lcd.print_row(1, offs)
             lcd.print_row(2, source_str)
