@@ -241,7 +241,6 @@ def main_loop():
                 dev_str = "       "
             else:
                 dev_str = f"{stats['adjusted_offset']:>7}"
-            #last_str = f"SATS[{sats}]     {dev_str}"
             last_str = f"F[{mode}] {sats_used}/{sats}   {dev_str}"  
             lcd.print_row(0, time_str)
             lcd.print_row(1, offs)
