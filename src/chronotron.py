@@ -3,12 +3,18 @@
 import time
 from datetime import datetime
 import subprocess
-import gpsd  # from gpsd-py3
+import gps  # from python3-gps
 import logging
+import threading
 
 from i2c_lcd import LcdDisplay
 
 # from button import Button
+
+gps_lock = threading.Lock()
+gps_mode = None
+gps_sats_used = None
+gps_sats = None
 
 
 def is_current_time_in_interval(start_time_str, end_time_str):
@@ -44,13 +50,10 @@ def get_statistics(log, host="localhost"):
     # Get number of active satellites from gpsd
     n = 0
     stats = {}
-    try:
-        gpsd.connect(host)
-        n = gpsd.get_current().sats_valid
-        stats["sats"] = n
-    except:
-        stats["sats"] = None
-        pass
+    with gps_lock:
+        stats["mode"] = gps_mode
+        stats["sats"] = gps_sats
+        stats["sats_used"] = gps_sats_used
 
     # Get chrony tracking information
     cmd = ["chronyc", "tracking"]
@@ -124,8 +127,8 @@ def main_loop():
     version = "2.0.0"
 
     # Time interval for backlight, set to None for permanent backlight:
-    start_time = "07:00"
-    end_time = "21:00"
+    start_time = "09:00"
+    end_time = "00:00"
 
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger("Chronotron")
@@ -218,6 +221,14 @@ def main_loop():
                 sats = "--"
             else:
                 sats = f"{stats['sats']:02}"
+            if stats["sats_used"] is None:
+                sats_used = "--"
+            else:
+                sats_used = f"{stats['sats_used']:02}"
+            if stats["mode"] is None:
+                mode = "-"
+            else:
+                mode = f"{stats['mode']:01}"
             if stats["is_locked"]:
                 source_str = "L[*] "
             else:
@@ -230,12 +241,33 @@ def main_loop():
                 dev_str = "       "
             else:
                 dev_str = f"{stats['adjusted_offset']:>7}"
-            last_str = f"SATS[{sats}]     {dev_str}"
+            #last_str = f"SATS[{sats}]     {dev_str}"
+            last_str = f"F[{mode}] {sats_used}/{sats}   {dev_str}"  
             lcd.print_row(0, time_str)
             lcd.print_row(1, offs)
             lcd.print_row(2, source_str)
             lcd.print_row(3, last_str)
         time.sleep(0.05)
 
+def gps_client():
+    global gps_mode
+    global gps_sats
+    global gps_sats_used
+    session = gps.gps(mode=gps.WATCH_ENABLE)
+    try:
+        while 0 == session.read():
+            if not (gps.MODE_SET & session.valid):
+                continue
+            with gps_lock:
+                gps_mode = session.fix.mode
+                gps_sats = len(session.satellites)
+                gps_sats_used = session.satellites_used
+    finally:
+        session.close()
+
+
+gps_thread = threading.Thread(target = gps_client)
+gps_thread.daemon = True
+gps_thread.start()
 
 main_loop()
