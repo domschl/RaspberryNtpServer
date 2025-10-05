@@ -11,11 +11,11 @@ from i2c_lcd import LcdDisplay
 
 # from button import Button
 
+# Global Variables for GPS data from background thread
 gps_lock = threading.Lock()
 gps_mode = None
 gps_sats_used = None
 gps_sats = None
-
 
 def is_current_time_in_interval(start_time_str, end_time_str):
     # Get the current local time
@@ -127,8 +127,8 @@ def main_loop():
     version = "2.0.0"
 
     # Time interval for backlight, set to None for permanent backlight:
-    start_time = "09:00"
-    end_time = "00:00"
+    start_time = "07:00"
+    end_time = "21:00"
 
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger("Chronotron")
