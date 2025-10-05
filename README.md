@@ -618,6 +618,7 @@ Optionally, you can use [this sub-project to a status display to the Raspberry P
 
 ## History
 
+- 2025-10-05: Changed display software to use python3-gps library, thanks [rglidden](https://github.com/rglidden)
 - 2024-04-30: Changes to Raspberry Pi 5 serial Port configuration, see [6](https://github.com/domschl/RaspberryNtpServer/issues/6), thanks @aGGreSSiv for figuring out the issue!
 - 2024-03-06: Update: location of `/boot/config.txt` has changed to `/boot/firmware/config.txt`. Thanks to @Nebulosa-Cat for the information!
 - 2023-12-21: Cleanup for the display software, display current stratum level (thanks @Lefuneste83, see [#7](https://github.com/domschl/RaspberryNtpServer/issues/7)), implemented logging.

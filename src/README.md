@@ -36,49 +36,17 @@ Old Raspis use `sm_bus=0`.
 
 > **Note:** Standard Raspberry Pi OS (tested with 'Bookworm') is recommended and used below
 
-This project uses Martijn Braam's python gpsd driver <https://github.com/MartijnBraam/gpsd-py3> (minimum version `0.3.0`, and `smbus` (already available on some distributions).
+This project uses `python3-gps` and `python3-smbus` (already available on some distributions).
 
-With recent python and Raspberry Pi OS updates, installation became a bit more complicated, since it is no longer easily allowed to install PIP modules into the root context.
-There are two solutions
+### Python dependencies
 
-### Prep variant 1 - Slightly improper shortcut `--break-system-packages`
-
-> **Note:** there is a proper way to do things, see next chapter using `venv`
-
-If you want to avoid working with Python virtual environments (e.g because the Raspberry is simply a single-use time server), you can simply force installation of gpsd-py3 into root context, which is generally considered bad practice, but in our case of limited risk, since gpsd-py3 has no further dependencies and is not part of any package manager.
-
-Install with:
+Install the python GPS library and smbus, if they are not already installed on your system:
 
 ```bash
-# should be already installed:
-sudo apt install python3-smbus
-# You need at least version 0.3.0 of gpsd-py3, otherwise number of satellites is not supported
-sudo pip install --break-system-packages gpsd-py3
+sudo apt install python3-gps python3-smbus
 ```
 
-### Prep variant 2 - Use proper Python virtual environments for installations, avoiding `--break-system-packages`
-
-The proper way to install is to create a virtual environment for chronotron:
-
-If `chronotron` does not start, check with `sudo systemctl status chronotron`: It will show if it can't 
-import a required packages.
-
-```bash
-cd /opt
-# create a virtual env at /opt/chronotron
-sudo python -m venv chronotron
-# make the directory tree /opt/chronotron accessible for your current user
-chown -R $USER:$USER chronotron
-cd chronotron
-# activate the virtual environment, which allows to install pip modules into it.
-source bin/activate
-# No root!
-pip install smbus gpsd-py3
-```
-
-Now, while the venv is active, you have access to the packages installed within it. You can deactivate a venv with `deactivate` and re-activate it again with `source bin/activate` while being in the `/opt/chronotron` directory.
-
-When using systemd use the `chronotron_venv.service`, (rename to `chronotron.service`). This uses the python version of the chronotron venv we just created. 
+Note: Previous versions of this software relied on `gps-py3` which was not included in Raspberry Pi OS python libraries and therefore required a venv. This is no longer required. See [PR9](https://github.com/domschl/RaspberryNtpServer/pull/19) for more details on the changes. If you previously used a venv, you might need to update your systemd service file.
 
 ## Installation of chronotron software
 
@@ -101,23 +69,10 @@ cp button.py chronotron.py i2c_lcd.py /opt/chronotron
 
 2. Install the systemd service
 
-- If you did not use a python virtual environment, use `chronotron.service`:
-
 ```bash
 # no venv
 sudo cp chronotron.service /etc/systemd/system
 ```
-
-- If you used a virtual environment, use `chronotron_venv.service` and rename it:
-
-```bash
-# with chronotron venv
-sudo cp chronotron_venv.service /etc/systemd/system/chronotron.service
-```
-
-While the venv is active, check with `which python` that the path to the venv's python matches the configuration of your systemd file, the line `ExecStart=/opt/chronotron/bin/python /opt/chronotron/chronotron.py` should use the python from within the venv, which automatically activates the venv when the service is started.
-
-3. Both variants
 
 Enable the systemd server `chronotron` with:
 
@@ -152,15 +107,6 @@ Dec 21 09:38:37 chronotron chronotron.py[2628]: INFO:Chronotron:Chrony stratum l
 Dec 21 09:38:37 chronotron chronotron.py[2628]: INFO:Chronotron:Chrony locked to high precision GPS PPS signal
 ```
 
-Note: if you are using a chronotron virtual python environment (venv) it should look like this:
-
-```
-CGroup: /system.slice/chronotron.service
-             └─8197 /opt/chronotron/bin/python /opt/chronotron/chronotron.py
-```
-
-Notice the path for python: in case of venv, we use the venv's python version.
-
 ## Notes on the display-information
 
 <img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd-notes.jpg" align="right" width="600" />
@@ -170,7 +116,7 @@ Notice the path for python: in case of venv, we use the venv's python version.
 3. Shows the output of `chronyc tracking`, entry `system time`, the time difference to the NTP reference (see below for further information).
 4. `L[ ]` no lock, `L[*]` lock. A lock (`*`) indicates that time synchronisation is established, either via remote NTP servers or GPS + PPS
 5. `PPS` signales that the lock is active using GPS and PPS, the server is in high-precision stratum 1 mode. If instead a hostname is displayed, then PPS is NOT active, and the network is used for time synchronisation, resulting in lower precision.
-6. `SAT[nn]`, `nn` is the number of satellites that are actively used for time synchronisation.
+6. `F[n] mm/oo`, `n` is the GPS fix type: '-': unknown, 1: no fix, 2: 2D fix, 3: 3D fix, mm: used satellites, oo: total seen satellites.
 7. Shows output of `chronyc sources`, the last column, "adjusted offset", of the currently active source, which is the estimated error (see below for further information)
 
 ### Further information and references
