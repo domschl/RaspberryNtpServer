@@ -116,7 +116,8 @@ Dec 21 09:38:37 chronotron chronotron.py[2628]: INFO:Chronotron:Chrony locked to
 3. Shows the output of `chronyc tracking`, entry `system time`, the time difference to the NTP reference (see below for further information).
 4. `L[ ]` no lock, `L[*]` lock. A lock (`*`) indicates that time synchronisation is established, either via remote NTP servers or GPS + PPS
 5. `PPS` signales that the lock is active using GPS and PPS, the server is in high-precision stratum 1 mode. If instead a hostname is displayed, then PPS is NOT active, and the network is used for time synchronisation, resulting in lower precision.
-6,7. **New** `F[n] mm/oo`, `n` is the GPS fix type: '-': unknown, 1: no fix, 2: 2D fix, 3: 3D fix, mm: used satellites, oo: total seen satellites.
+6. **New** `F[n]`, `n` is the GPS fix type: '-': unknown, 1: no fix, 2: 2D fix, 3: 3D fix.
+7. **New** `nn/mm`, nn: used satellites, mm: total seen satellites, including unused ones.
 8. Shows output of `chronyc sources`, the last column, "adjusted offset", of the currently active source, which is the estimated error (see below for further information)
 
 ### Further information and references
