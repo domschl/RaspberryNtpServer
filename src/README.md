@@ -46,7 +46,9 @@ Install the python GPS library and smbus, if they are not already installed on y
 sudo apt install python3-gps python3-smbus
 ```
 
-Note: Previous versions of this software relied on `gps-py3` which was not included in Raspberry Pi OS python libraries and therefore required a venv. This is no longer required. See [PR9](https://github.com/domschl/RaspberryNtpServer/pull/19) for more details on the changes. If you previously used a venv, you might need to update your systemd service file.
+Note: Previous versions of this software relied on `gps-py3`, which was not included in Raspberry Pi OS python libraries and therefore required a venv. This is no longer required. See [PR9](https://github.com/domschl/RaspberryNtpServer/pull/19) for more details on the changes. If you previously used a venv, you might need to update your systemd service file.
+
+Note: Trixie requires update to the new dependencies, otherwise GPS satellite status is broken!
 
 ## Installation of chronotron software
 
@@ -184,4 +186,6 @@ The `chronotron.py` systemd service checks periodically `chronyc` for NTP statis
 - `i2c_lcd.py` is a buffered driver for the LCD display.
 - `chronotron.service` is the systemd service file.
 
+## History
 
+- 2025-10-05: Update of dependencies, Trixie support (thanks [rglidden](https://github.com/rglidden))
