@@ -130,7 +130,13 @@ PTP is completely optional and not required in a network in order to have excell
 
 > **Note:** _(Optional info)_ The original repository of `chrony` at <https://chrony.tuxfamily.org/> seems to be of low availability. In case of problems, use the mirror at <https://github.com/mlichvar/chrony)> if you want to reference the original `chrony` sources at some point.
 
-### Raspberry Linux preparations
+### Raspberry Pi OS preparations
+
+Supported are Raspberry Pi OS Bookworm and Trixie
+
+#### Update Notes
+
+If you are updating from 'Bookworm' to 'Trixie', and you are using the display, you will need to update the [display software](https://github.com/domschl/RaspberryNtpServer/tree/main/src) and its dependencies.
 
 #### Serial port console (skip, if connected via USB)
 
@@ -220,7 +226,7 @@ This is compensated by the PPS signal that is directly connected to Raspberry PI
 
 We need to enable a special kernel driver and overlay in order to receive this once-per-second GPS synchronised pulse as precisely as possible. The location of config files for kernel modules and options has changed recently (2024-03)!
 
-### Current Raspberry Pi OS 'Bookworm' (since 2024-03)
+### Current Raspberry Pi OS 'Bookworm' (since 2024-03) and 'Trixie' (since 2025-10)
 
 You'll find that `/boot/config.txt` just contains a note that file content has moved to `/boot/firmware/config.txt`. 
 
@@ -270,7 +276,7 @@ Some linux distribution only allow `root` to read or access `/dev/pps0`. This is
 
 ### Timeouts with Raspberry Pi OS 64-bit 2023-03 onwards
 
-**Note:** This problem seems to be fixed with current Raspberry Pi OS 'bookworm' releases (2023-12 status).
+**Note:** This problem seems to be fixed with current Raspberry Pi OS 'bookworm' and 'trixie' releases (2023-12 status).
 
 `sudo ppstest /dev/pps0` yields:
 
