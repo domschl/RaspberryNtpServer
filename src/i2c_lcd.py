@@ -15,6 +15,14 @@ class LcdDisplay:
             self.active = False
             return
 
+        try:
+            self.bus.read_byte(i2c_addr)
+            self.log.info(f"Connected to display at i2c address 0x{hex(i2c_addr)}")
+        except:
+            self.log.error(f"No device found at i2c address 0x{hex(i2c_addr)}")
+            self.active = False
+            return
+        
         self.i2c_addr = i2c_addr
         self.cols = cols
         self.rows = rows
@@ -138,11 +146,14 @@ class LcdDisplay:
 
 
 if __name__ == "__main__":
-    lcd = LcdDisplay(1, 0x27, 20, 4)
+    i2c_addr = 0x27
+    lcd = LcdDisplay(1, i2c_addr, 20, 4)
     if lcd.active is True:
+        print("Display is active, outputting a test-text to the display...")
         lcd.print(
             "Hello! That is a hell of a lot of text that we are going to display on this tiny screen. However there is always a way to present information in a way that is helpful, even under contrained conditions."
         )
+        print("Done")
         exit(0)
     else:
         print("Failed to initialize display")
