@@ -409,7 +409,7 @@ GPS                        40  22   626     -4.310      9.467    512ms  2474us
 
 the important field is `offset` of `GPS`: if that is larger 200ms, PPS cannot sync to GPS.
 
-Wait a few minutes for the offset to stabilize, note it's value, and edit `/etc/chrony.conf`, and change the offset in the second line with the value above, converted to seconds (512ms are 0.512 sec in this case):
+Wait a few minutes for the offset to stabilize, note it's value, and edit `/etc/chrony.conf` (or `/etc/chrony/chrony.conf`), and change the offset in the second line with the value above, converted to seconds (512ms are 0.512 sec in this case):
 
 ```
 refclock PPS /dev/pps0 lock GPS
