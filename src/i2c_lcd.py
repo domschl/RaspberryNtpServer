@@ -17,9 +17,9 @@ class LcdDisplay:
 
         try:
             self.bus.read_byte(i2c_addr)
-            self.log.info(f"Connected to display at i2c address 0x{hex(i2c_addr)}")
+            self.log.info(f"Connected to display at i2c address {hex(i2c_addr)}")
         except:
-            self.log.error(f"No device found at i2c address 0x{hex(i2c_addr)}")
+            self.log.error(f"No device found at i2c address {hex(i2c_addr)}")
             self.active = False
             return
         
