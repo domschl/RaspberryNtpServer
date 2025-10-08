@@ -5,8 +5,9 @@ import copy
 
 
 class LcdDisplay:
-    def __init__(self, sm_bus=1, i2c_addr=0x27, cols=20, rows=4):
+    def __init__(self, sm_bus=1, i2c_addr=0x27, cols=20, rows=4, ada=False):
         self.log = logging.getLogger("LcdDisplay")
+        self.ada = ada
         try:
             self.bus = smbus.SMBus(sm_bus)  # Rev 1 Pi: 0, Rev 2 Pi: 1
             self.active = True
@@ -30,7 +31,7 @@ class LcdDisplay:
 
         self.start_byte_delay = 0.001
         self.delay = 0.00001
-        self.cls_delay = 0.0008
+        self.cls_delay = 0.003
         self.type_data = 1
         self.type_command = 0
         self.enable = 0x04
@@ -61,8 +62,14 @@ class LcdDisplay:
         if self.active is False:
             return
 
-        hi_byte = data_type | (byte & 0xF0) | self.backlight
-        lo_byte = data_type | ((byte << 4) & 0xF0) | self.backlight
+        if self.ada is True:
+            backlight = self.backlight << 4
+            data_type = data_type << 1
+            hi_byte = data_type | ((byte & 0xF0) >> 1) | backlight
+            lo_byte = data_type | ((byte & 0x0F) << 3) | backlight
+        else:
+            hi_byte = data_type | (byte & 0xF0) | self.backlight
+            lo_byte = data_type | ((byte << 4) & 0xF0) | self.backlight
 
         time.sleep(self.start_byte_delay)
         self.bus.write_byte(self.i2c_addr, hi_byte)
@@ -148,9 +155,13 @@ class LcdDisplay:
 
 if __name__ == "__main__":
     i2c_addr = 0x27
-    lcd = LcdDisplay(1, i2c_addr, 20, 4)
+    adafruit_hw = False
+    lcd = LcdDisplay(1, i2c_addr, 20, 4, ada=adafruit_hw)
     if lcd.active is True:
-        print("Display is active, outputting a test-text to the display...")
+        if adafruit_hw is True:
+            print("Display (Ada) is active, outputting a test-text to the display...")
+        else:
+            print("Display is active, outputting a test-text to the display...")
         lcd.print(
             "Hello! That is a hell of a lot of text that we are going to display on this tiny screen. However there is always a way to present information in a way that is helpful, even under contrained conditions."
         )
