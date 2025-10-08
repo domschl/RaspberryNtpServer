@@ -28,6 +28,7 @@ class LcdDisplay:
         self.rows = rows
         self.line_cmds = [0x80, 0xC0, 0x94, 0xD4]  # lines 1-4
 
+        self.start_byte_delay = 0.001
         self.delay = 0.00001
         self.cls_delay = 0.0008
         self.type_data = 1
@@ -36,9 +37,7 @@ class LcdDisplay:
         self.set_backlight(True)
 
         self.write(0x33, self.type_command)  # init sequence: 0x03, 0x03
-        #        time.sleep(self.delay)
         self.write(0x32, self.type_command)  # init seq cont: 0x03, 0x02
-        #        time.sleep(self.delay)
         self.write(0x06, self.type_command)  # cursor dir
         self.write(0x0C, self.type_command)  # display on, cursor off, blink of
         self.write(0x28, self.type_command)  # data len, num lines, font size
@@ -65,6 +64,7 @@ class LcdDisplay:
         hi_byte = data_type | (byte & 0xF0) | self.backlight
         lo_byte = data_type | ((byte << 4) & 0xF0) | self.backlight
 
+        time.sleep(self.start_byte_delay)
         self.bus.write_byte(self.i2c_addr, hi_byte)
         time.sleep(self.delay)
         self.bus.write_byte(self.i2c_addr, (hi_byte | self.enable))
@@ -72,6 +72,7 @@ class LcdDisplay:
         self.bus.write_byte(self.i2c_addr, (hi_byte & ~self.enable))
         time.sleep(self.delay)
 
+        time.sleep(self.start_byte_delay)
         self.bus.write_byte(self.i2c_addr, lo_byte)
         time.sleep(self.delay)
         self.bus.write_byte(self.i2c_addr, (lo_byte | self.enable))
