@@ -187,4 +187,5 @@ The `chronotron.py` systemd service checks periodically `chronyc` for NTP statis
 
 ## History
 
+- 2025-10-08: Add I2C port check on display initialization
 - 2025-10-05: Update of dependencies, Trixie support (thanks [rglidden](https://github.com/rglidden))
