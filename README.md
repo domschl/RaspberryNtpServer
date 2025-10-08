@@ -332,6 +332,7 @@ refclock PPS /dev/pps0 lock GPS
 refclock SHM 0 refid GPS precision 1e-1 offset 0.01 delay 0.2 noselect
 ```
 
+> **Note:** See [man chrony.conf](https://chrony-project.org/doc/4.4/chrony.conf.html) for more details
 > **Note:** For recent `chrony` versions, an offset of `0.0` seems to prevent GPS sync, hence set it to `offset 0.01` (or any small, non-zero value) for start. See below, how to get the actual correct `offset` value.
 
 This uses a shared memory device `SHM` to get unprecise time information from GPSD (low precision, marked as `noselect`, so that chrony doesn't try to sync to serial time data). This unprecise time information is then synchronised with the much more precise PPS signal.
@@ -383,6 +384,8 @@ MS Name/IP address         Stratum Poll Reach LastRx Last sample
 ^- ntp2.hetzner.de               2  10   377    59   -411us[ -411us] +/-   32ms
 chronyc> 
 ```
+
+**Note:** See [man chronyc](https://chrony-project.org/doc/4.0/chronyc.html) for more details
 
 <div align="right">
 <img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd-slow.jpg" width="300" /><br>
@@ -635,6 +638,7 @@ Optionally, you can use [this sub-project to a status display to the Raspberry P
 
 ### References
 
+- [`chrony` documentation](https://chrony-project.org/documentation.html)
 - [`chrony` documentation (mirror)](https://github.com/mlichvar/chrony/tree/master/doc)
 
 [^1]: Thanks @cvonderstein for providing this information, see [#1](https://github.com/domschl/RaspberryNtpServer/issues/1) for further discussion.
