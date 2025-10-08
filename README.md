@@ -332,6 +332,7 @@ refclock PPS /dev/pps0 lock GPS
 refclock SHM 0 refid GPS precision 1e-1 offset 0.01 delay 0.2 noselect
 ```
 
+> **Note:** See [man chrony.conf](https://chrony-project.org/doc/4.4/chrony.conf.html) for more details
 > **Note:** For recent `chrony` versions, an offset of `0.0` seems to prevent GPS sync, hence set it to `offset 0.01` (or any small, non-zero value) for start. See below, how to get the actual correct `offset` value.
 
 This uses a shared memory device `SHM` to get unprecise time information from GPSD (low precision, marked as `noselect`, so that chrony doesn't try to sync to serial time data). This unprecise time information is then synchronised with the much more precise PPS signal.
@@ -384,6 +385,8 @@ MS Name/IP address         Stratum Poll Reach LastRx Last sample
 chronyc> 
 ```
 
+**Note:** See [man chronyc](https://chrony-project.org/doc/4.0/chronyc.html) for more details
+
 <div align="right">
 <img src="https://github.com/domschl/RaspberryNtpServer/blob/main/images/ntp-lcd-slow.jpg" width="300" /><br>
 <em>Before PPS lock, stratum 3</em>
@@ -409,7 +412,7 @@ GPS                        40  22   626     -4.310      9.467    512ms  2474us
 
 the important field is `offset` of `GPS`: if that is larger 200ms, PPS cannot sync to GPS.
 
-Wait a few minutes for the offset to stabilize, note it's value, and edit `/etc/chrony.conf`, and change the offset in the second line with the value above, converted to seconds (512ms are 0.512 sec in this case):
+Wait a few minutes for the offset to stabilize, note it's value, and edit `/etc/chrony.conf` (or `/etc/chrony/chrony.conf`), and change the offset in the second line with the value above, converted to seconds (512ms are 0.512 sec in this case):
 
 ```
 refclock PPS /dev/pps0 lock GPS
@@ -635,6 +638,7 @@ Optionally, you can use [this sub-project to a status display to the Raspberry P
 
 ### References
 
+- [`chrony` documentation](https://chrony-project.org/documentation.html)
 - [`chrony` documentation (mirror)](https://github.com/mlichvar/chrony/tree/master/doc)
 
 [^1]: Thanks @cvonderstein for providing this information, see [#1](https://github.com/domschl/RaspberryNtpServer/issues/1) for further discussion.
