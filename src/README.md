@@ -9,7 +9,7 @@ Note: the main script `chronotron.py` defines a `start_time` and an `end_time`, 
 ## Hardware requirements
 
 - Display: HD44780 2004 LCD Display 4x20 characters with I2C interface (address 0x27 is assumed by the code), use for example:
-  - Adafruit [LCD 4x20](https://www.adafruit.com/product/198) and [I2C Adapter](https://www.adafruit.com/product/292), description: (https://learn.adafruit.com/i2c-spi-lcd-backpack). Advantage: Stemma QT adapter (QWIIC) that can be also added to [Raspberry PI](https://www.adafruit.com/product/4463#:~:text=The%20SparkFun%20Qwiic%20or%20Stemma%20QT%20SHIM%20for,QT%20or%20Qwiic%29%20connector%20to%20your%20Raspberry%20Pi.) for clean cabling.
+  - Adafruit [LCD 4x20](https://www.adafruit.com/product/198) and [I2C Adapter](https://www.adafruit.com/product/292), description: (https://learn.adafruit.com/i2c-spi-lcd-backpack). Advantage: Stemma QT adapter (QWIIC) that can be also added to [Raspberry PI](https://www.adafruit.com/product/4463#:~:text=The%20SparkFun%20Qwiic%20or%20Stemma%20QT%20SHIM%20for,QT%20or%20Qwiic%29%20connector%20to%20your%20Raspberry%20Pi.) for clean cabling. Note: uses MCP23008 chip requires changes to the default configuration.
   - Amazon kit [sunfounder kit](https://www.amazon.com/SunFounder-Serial-Module-Arduino-Mega2560/dp/B01GPUMP9C)
   - AliExpress kit [TZT Five Star](https://de.aliexpress.com/item/1005001679675215.html
 
@@ -34,7 +34,7 @@ Old Raspis use `sm_bus=0`.
 
 ## Software requirements
 
-> **Note:** Standard Raspberry Pi OS (tested with 'Bookworm') is recommended and used below
+> **Note:** Standard Raspberry Pi OS (tested with 'Bookworm' and 'Trixie') is recommended and used below
 
 This project uses `python3-gps` and `python3-smbus` (already available on some distributions).
 
@@ -59,6 +59,38 @@ git clone https://github.com/domschl/RaspberryNtpServer
 cd RaspberryNtpServer/src
 ```
 
+1. Adapt configuration
+
+Check the beginning of the file `chronotron.py`, it contains a few parameters that can be adapted:
+
+```python
+#------- CONFIGURATION PARAMETERS -----------------------
+# start_time and end_time switch the display off during night-time.
+# Set both to None for always-on
+start_time:str|None = "07:00"
+end_time:str|None = "21:00"
+# I2C address of the display, usually between 0x20 (Adafruit default) and 0x27 (all others)
+i2c_address_display:int = 0x27
+# Set to True for Adafruit I2C adapter which uses MCP23008 chip. Enables Adafruit specific connections
+# Set to False for all others which use PCF8574 
+adafruit_i2c_hardware:bool = False
+# ---------------------------------------------------------
+```
+
+For Adafruit hardware that uses the MCP23008 chip and a (default) address of 0x20 make the following changes:
+
+```python
+i2c_address_display:int = 0x20
+adafruit_i2c_hardware:bool = True
+```
+
+If you don't want backlight to switch off during the night, set:
+
+start_time:str|None = None
+end_time:str|None = None
+
+Otherwise adapt the times to your liking, using 24h times and format "HH:MM"
+
 2. Copy the python files to `/opt/chronotron`:
 
 ```bash
@@ -68,7 +100,7 @@ chown -R $USER:$USER /opt/chronotron
 cp button.py chronotron.py i2c_lcd.py /opt/chronotron
 ```
 
-2. Install the systemd service
+3. Install the systemd service
 
 ```bash
 sudo cp chronotron.service /etc/systemd/system
@@ -187,5 +219,6 @@ The `chronotron.py` systemd service checks periodically `chronyc` for NTP statis
 
 ## History
 
+- 2025-10-09: Support Adafruit's hardware that uses a different I2C chip, the MCP23008
 - 2025-10-08: Add I2C port check on display initialization
 - 2025-10-05: Update of dependencies, Trixie support (thanks [rglidden](https://github.com/rglidden))

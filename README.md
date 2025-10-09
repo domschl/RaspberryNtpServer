@@ -626,6 +626,7 @@ Optionally, you can use [this sub-project to a status display to the Raspberry P
 
 ## History
 
+- 2025-10-09: Support for Adafruit I2C hardware using MCP23008 added, thanks @Bigjohn4 for testing support.
 - 2025-10-05: Changed display software to use python3-gps library, thanks [rglidden](https://github.com/rglidden)
 - 2024-04-30: Changes to Raspberry Pi 5 serial Port configuration, see [6](https://github.com/domschl/RaspberryNtpServer/issues/6), thanks @aGGreSSiv for figuring out the issue!
 - 2024-03-06: Update: location of `/boot/config.txt` has changed to `/boot/firmware/config.txt`. Thanks to @Nebulosa-Cat for the information!
