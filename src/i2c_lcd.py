@@ -56,14 +56,11 @@ class LcdDisplay:
     def _init_mcp23008(self):
         # Taken from: <https://github.com/adafruit/Adafruit_CircuitPython_MCP230xx/blob/main/adafruit_mcp230xx/mcp23008.py>
         if self.ada is True:
-            self._dev_write(0x00)  # IODIR function call
-            self._dev_write(0xff)  # Reset to all inputs
+            self.bus.write_byte_data(self.i2c_addr, 0x00, 0xff)  # IODIR, reset all to input  # pyright:ignore[reportUnknownMemberType]
             time.sleep(self.delay)
-            self._dev_write(0x06)  # GGPU function call
-            self._dev_write(0x00)  # All pull-ups off
+            self.bus.write_byte_data(self.i2c_addr, 0x06, 0x00)  # GGPU, all pull-ups off  # pyright:ignore[reportUnknownMemberType]
             time.sleep(self.delay)
-            self._dev_write(0x01)  # IPOL function call
-            self._dev_write(0x00)  # No inverse polarity
+            self.bus.write_byte_data(self,i2c_addr, 0x01, 0x00)  # IPOL, no inverse polarity  # pyright:ignore[reportUnknownMemberType]
             time.sleep(self.delay)
             
     def set_backlight(self, state:bool):
@@ -76,8 +73,9 @@ class LcdDisplay:
 
     def _dev_write(self, byte:int):
         if self.ada is True:
-            self.bus.write_byte(self.i2c_addr, 0x09)  # MCP33008 GPIO function    # pyright:ignore[reportUnknownMemberType]
-        self.bus.write_byte(self.i2c_addr, byte)  # pyright:ignore[reportUnknownMemberType]
+            self.bus.write_byte_data(self.i2c_addr, 0x09, byte)  # MCP23008 GPIO function    # pyright:ignore[reportUnknownMemberType]
+        else:
+            self.bus.write_byte(self.i2c_addr, byte)  # pyright:ignore[reportUnknownMemberType]
         
     def write(self, byte:int, data_type:int):
         if self.active is False:
