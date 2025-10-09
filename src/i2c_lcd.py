@@ -75,7 +75,7 @@ class LcdDisplay:
             time.sleep(self.delay)
             self.bus.write_byte_data(self.i2c_addr, 0x06, 0x00)  # GGPU, all pull-ups off  # pyright:ignore[reportUnknownMemberType]
             time.sleep(self.delay)
-            self.bus.write_byte_data(self,i2c_addr, 0x01, 0x00)  # IPOL, no inverse polarity  # pyright:ignore[reportUnknownMemberType]
+            self.bus.write_byte_data(self.i2c_addr, 0x01, 0x00)  # IPOL, no inverse polarity  # pyright:ignore[reportUnknownMemberType]
             time.sleep(self.delay)
             
     def set_backlight(self, state:bool):
