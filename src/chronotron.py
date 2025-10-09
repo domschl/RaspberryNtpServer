@@ -3,21 +3,22 @@
 import time
 from datetime import datetime
 import subprocess
-import gps  # from python3-gps
+import gps  # from python3-gps  # pyright:ignore[reportMissingTypeStubs]
 import logging
 import threading
+from typing import Any, cast
 
 from i2c_lcd import LcdDisplay
 
 # from button import Button
 
 # Global Variables for GPS data from background thread
-gps_lock = threading.Lock()
-gps_mode = None
-gps_sats_used = None
-gps_sats = None
+gps_lock: threading.Lock = threading.Lock()
+gps_mode: int|None = None
+gps_sats_used: int|None = None
+gps_sats: int|None = None
 
-def is_current_time_in_interval(start_time_str, end_time_str):
+def is_current_time_in_interval(start_time_str:str, end_time_str:str):
     # Get the current local time
     current_time = datetime.now().time()
     # Parse start and end times from strings
@@ -30,14 +31,17 @@ def is_current_time_in_interval(start_time_str, end_time_str):
         return start_time <= current_time <= end_time
 
 
-def exec_cmd(cmd):
-    ret = []
+def exec_cmd(log:logging.Logger, cmd:list[str]) -> list[str]:
+    ret:list[str] = []
     p = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=-1
     )
+    if p.stdout is None:
+        log.error(f"Failed to execute {cmd}")
+        return []
     for line in p.stdout:
         ret.append(line.decode("utf-8").strip())
-    p.wait()
+    _ = p.wait()
     if p.returncode != 0:
         cm = ""
         for c in cmd:
@@ -46,10 +50,10 @@ def exec_cmd(cmd):
     return ret
 
 
-def get_statistics(log, host="localhost"):
+def get_statistics(log:logging.Logger, _host:str="localhost") -> dict[str, Any]:  # pyright:ignore[reportExplicitAny]
     # Get number of active satellites from gpsd
     n = 0
-    stats = {}
+    stats: dict[str, Any] = {}  # pyright:ignore[reportExplicitAny]
     with gps_lock:
         stats["mode"] = gps_mode
         stats["sats"] = gps_sats
@@ -57,7 +61,7 @@ def get_statistics(log, host="localhost"):
 
     # Get chrony tracking information
     cmd = ["chronyc", "tracking"]
-    ret = exec_cmd(cmd)
+    ret = exec_cmd(log, cmd)
     stats["stratum"] = None
     stats["system_time_offset"] = None
     for line in ret:
@@ -80,7 +84,7 @@ def get_statistics(log, host="localhost"):
 
     # Get current time source
     cmd = ["chronyc", "sources"]
-    ret = exec_cmd(cmd)
+    ret = exec_cmd(log, cmd)
     stats["is_locked"] = False
     stats["is_pps"] = False
     stats["source"] = None
@@ -127,22 +131,22 @@ def main_loop():
     version = "2.0.0"
 
     # Time interval for backlight, set to None for permanent backlight:
-    start_time = "07:00"
-    end_time = "21:00"
+    start_time:str|None = "07:00"
+    end_time:str|None = "21:00"
 
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger("Chronotron")
     log.setLevel("INFO")
     log.info(f"Chronotron version {version} starting")
 
-    def select_button():
+    def select_button():  # pyright:ignore[reportUnusedFunction]
         nonlocal select_state
         nonlocal select_states
         nonlocal trigger_time
         trigger_time = time.time()
         select_state = (select_state + 1) % select_states
 
-    def main_button():
+    def main_button():  # pyright:ignore[reportUnusedFunction]
         nonlocal main_state
         nonlocal main_states
         nonlocal trigger_time
@@ -160,10 +164,10 @@ def main_loop():
         time_str = time.strftime("%Y-%m-%d  %H:%M:%S")
         if time_str != last_time:
             if (
-                start_time is None
-                or end_time is None
+                start_time is None  # pyright:ignore[reportUnnecessaryComparison]
+                or end_time is None  # pyright:ignore[reportUnnecessaryComparison]
                 or is_current_time_in_interval(start_time, end_time)
-                or start_time == end_time
+                or start_time == end_time  # pyright:ignore[reportUnnecessaryComparison]
             ):
                 lcd.set_backlight(True)
             else:
@@ -172,12 +176,12 @@ def main_loop():
             stats = get_statistics(log)
 
             if stats["is_locked"] != old_lock:
-                old_lock = stats["is_locked"]
+                old_lock:bool = cast(bool, stats["is_locked"])
                 if old_lock is True:
                     log.info("Chrony aquired lock to time source")
 
             if old_src != stats["source"]:
-                old_src = stats["source"]
+                old_src:str|None = cast(str|None, stats["source"])
                 if old_src is None:
                     src = "None"
                 else:
@@ -185,16 +189,16 @@ def main_loop():
                 log.info(f"Chrony receiving time source from {src}")
 
             if old_stratum != stats["stratum"]:
-                old_stratum = stats["stratum"]
+                old_stratum:str|None = cast(str|None, stats["stratum"])
                 if old_stratum is None:
-                    strat = "?"
+                    strat:str = "?"
                 else:
                     strat = old_stratum
-                log.info(f"Chrony stratum level changed to {old_stratum}")
+                log.info(f"Chrony stratum level changed to {strat}")
 
             if old_pps != stats["is_pps"]:
-                old_pps = stats["is_pps"]
-                if old_pps:
+                old_pps:bool = cast(bool, stats["is_pps"])
+                if old_pps is True:
                     log.info("Chrony locked to high precision GPS PPS signal")
                 else:
                     log.info("Chrony lost PPS signal")
@@ -206,7 +210,7 @@ def main_loop():
             #         select_state = 0
             #     lcd.print_row(0, "Select 1")
 
-            offset = stats["system_time_offset"]
+            offset:str|None = cast(str|None, stats["system_time_offset"])
             offs = "            "
             if offset is not None:
                 if stats["stratum"] is None:
@@ -236,7 +240,7 @@ def main_loop():
             if stats["source"] is None:
                 source_str += "                    "
             else:
-                source_str += stats["source"]
+                source_str += cast(str, stats["source"])
             if stats["adjusted_offset"] is None:
                 dev_str = "       "
             else:
@@ -252,14 +256,14 @@ def gps_client():
     global gps_mode
     global gps_sats
     global gps_sats_used
-    session = gps.gps(mode=gps.WATCH_ENABLE)
+    session:gps.gps = gps.gps(mode=gps.WATCH_ENABLE)
     try:
         while 0 == session.read():
             if not (gps.MODE_SET & session.valid):
                 continue
             with gps_lock:
                 gps_mode = session.fix.mode
-                gps_sats = len(session.satellites)
+                gps_sats = len(session.satellites)  # pyright:ignore[reportUnknownArgumentType, reportUnknownMemberType]
                 gps_sats_used = session.satellites_used
     finally:
         session.close()

@@ -5,36 +5,36 @@ import copy
 
 
 class LcdDisplay:
-    def __init__(self, sm_bus=1, i2c_addr=0x27, cols=20, rows=4, ada=False):
-        self.log = logging.getLogger("LcdDisplay")
-        self.ada = ada
+    def __init__(self, sm_bus:int=1, i2c_addr:int=0x27, cols:int=20, rows:int=4, ada:bool=False):
+        self.log: logging.Logger = logging.getLogger("LcdDisplay")
+        self.ada: bool = ada
         try:
-            self.bus = smbus.SMBus(sm_bus)  # Rev 1 Pi: 0, Rev 2 Pi: 1
-            self.active = True
+            self.bus:smbus.SMBus = smbus.SMBus(sm_bus)  # Rev 1 Pi: 0, Rev 2 Pi: 1  # pyright:ignore[reportUnknownMemberType]
+            self.active:bool = True
         except Exception as e:
             self.log.error(f"Cannot open LCD on I2C bus: {e}")
             self.active = False
             return
 
         try:
-            self.bus.read_byte(i2c_addr)
+            self.bus.read_byte(i2c_addr)  # pyright:ignore[reportUnknownMemberType]
             self.log.info(f"Connected to display at i2c address {hex(i2c_addr)}")
         except:
             self.log.error(f"No device found at i2c address {hex(i2c_addr)}")
             self.active = False
             return
         
-        self.i2c_addr = i2c_addr
-        self.cols = cols
-        self.rows = rows
-        self.line_cmds = [0x80, 0xC0, 0x94, 0xD4]  # lines 1-4
+        self.i2c_addr:int = i2c_addr
+        self.cols:int = cols
+        self.rows:int = rows
+        self.line_cmds:list[int] = [0x80, 0xC0, 0x94, 0xD4]  # lines 1-4
 
-        self.start_byte_delay = 0.001
-        self.delay = 0.00001
-        self.cls_delay = 0.003
-        self.type_data = 1
-        self.type_command = 0
-        self.enable = 0x04
+        self.start_byte_delay:float = 0.001
+        self.delay:float = 0.00001
+        self.cls_delay:float = 0.003
+        self.type_data:int = 1
+        self.type_command:int = 0
+        self.enable:int = 0x04
         self.set_backlight(True)
 
         self.write(0x33, self.type_command)  # init sequence: 0x03, 0x03
@@ -45,20 +45,20 @@ class LcdDisplay:
         self.write(0x01, self.type_command)  # clear (slow!)
         time.sleep(self.cls_delay)
 
-        self.screen_buf = [[" " for _ in range(cols)] for _ in range(rows)]
-        self.cur_row = 0
-        self.cur_col = 0
+        self.screen_buf:list[list[str]] = [[" " for _ in range(cols)] for _ in range(rows)]
+        self.cur_row:int = 0
+        self.cur_col:int = 0
         self.log.debug("LCD display initialized.")
 
-    def set_backlight(self, state):
+    def set_backlight(self, state:bool):
         if self.active is False:
             return
-        if state:
-            self.backlight = 0x08
+        if state is True:
+            self.backlight:int = 0x08
         else:
             self.backlight = 0x00
 
-    def write(self, byte, data_type):
+    def write(self, byte:int, data_type:int):
         if self.active is False:
             return
 
@@ -72,22 +72,34 @@ class LcdDisplay:
             lo_byte = data_type | ((byte << 4) & 0xF0) | self.backlight
 
         time.sleep(self.start_byte_delay)
-        self.bus.write_byte(self.i2c_addr, hi_byte)
+        if self.ada is True:
+            self.bus.write_byte(self.i2c_addr, 0x09)  # MCP33008 GPIO function    # pyright:ignore[reportUnknownMemberType]
+        self.bus.write_byte(self.i2c_addr, hi_byte)  # pyright:ignore[reportUnknownMemberType]
         time.sleep(self.delay)
-        self.bus.write_byte(self.i2c_addr, (hi_byte | self.enable))
+        if self.ada is True:
+            self.bus.write_byte(self.i2c_addr, 0x09)  # MCP33008 GPIO function  # pyright:ignore[reportUnknownMemberType]
+        self.bus.write_byte(self.i2c_addr, (hi_byte | self.enable))  # pyright:ignore[reportUnknownMemberType]
         time.sleep(self.delay)
-        self.bus.write_byte(self.i2c_addr, (hi_byte & ~self.enable))
+        if self.ada is True:
+            self.bus.write_byte(self.i2c_addr, 0x09)  # MCP33008 GPIO function  # pyright:ignore[reportUnknownMemberType]
+        self.bus.write_byte(self.i2c_addr, (hi_byte & ~self.enable))  # pyright:ignore[reportUnknownMemberType]
         time.sleep(self.delay)
 
         time.sleep(self.start_byte_delay)
-        self.bus.write_byte(self.i2c_addr, lo_byte)
+        if self.ada is True:
+            self.bus.write_byte(self.i2c_addr, 0x09)  # MCP33008 GPIO function    # pyright:ignore[reportUnknownMemberType]
+        self.bus.write_byte(self.i2c_addr, lo_byte)  # pyright:ignore[reportUnknownMemberType]
         time.sleep(self.delay)
-        self.bus.write_byte(self.i2c_addr, (lo_byte | self.enable))
+        if self.ada is True:
+            self.bus.write_byte(self.i2c_addr, 0x09)  # MCP33008 GPIO function    # pyright:ignore[reportUnknownMemberType]
+        self.bus.write_byte(self.i2c_addr, (lo_byte | self.enable))  # pyright:ignore[reportUnknownMemberType]
         time.sleep(self.delay)
-        self.bus.write_byte(self.i2c_addr, (lo_byte & ~self.enable))
+        if self.ada is True:
+            self.bus.write_byte(self.i2c_addr, 0x09)  # MCP33008 GPIO function    # pyright:ignore[reportUnknownMemberType]
+        self.bus.write_byte(self.i2c_addr, (lo_byte & ~self.enable))  # pyright:ignore[reportUnknownMemberType]
         time.sleep(self.delay)
 
-    def write_row(self, row):
+    def write_row(self, row:int):
         if self.active is False:
             return
         ra = self.line_cmds[row]
@@ -95,7 +107,7 @@ class LcdDisplay:
         for i in range(self.cols):
             self.write(ord(self.screen_buf[row][i]), self.type_data)
 
-    def print_row(self, row, text):
+    def print_row(self, row:int, text:str):
         if self.active is False:
             return
         if row < 0:
@@ -106,7 +118,7 @@ class LcdDisplay:
         self.screen_buf[row] = [text[i] for i in range(len(text))]
         self.write_row(row)
 
-    def print_at(self, row, col, text):
+    def print_at(self, row:int, col:int, text:str):
         if self.active is False:
             return
         if row < 0 or row > self.rows - 1:
@@ -118,7 +130,7 @@ class LcdDisplay:
             self.screen_buf[row][i + col] = text[i]
         self.write_row(row)
 
-    def scroll(self, n=1):
+    def scroll(self, n:int=1):
         if self.active is False:
             return
         for _ in range(n):
@@ -131,7 +143,7 @@ class LcdDisplay:
         if self.cur_row > 0:
             self.cur_row = self.cur_row - 1
 
-    def print(self, text):
+    def print(self, text:str):
         if self.active is False:
             return
         if len(text) + self.cur_col > self.cols:
@@ -154,8 +166,8 @@ class LcdDisplay:
 
 
 if __name__ == "__main__":
-    i2c_addr = 0x27
-    adafruit_hw = False
+    i2c_addr:int = 0x27
+    adafruit_hw:bool = False
     lcd = LcdDisplay(1, i2c_addr, 20, 4, ada=adafruit_hw)
     if lcd.active is True:
         if adafruit_hw is True:
