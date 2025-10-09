@@ -37,6 +37,9 @@ class LcdDisplay:
         self.enable:int = 0x04
         self.set_backlight(True)
 
+        if self.ada is True:
+            self._init_mcp23008()
+            
         self.write(0x33, self.type_command)  # init sequence: 0x03, 0x03
         self.write(0x32, self.type_command)  # init seq cont: 0x03, 0x02
         self.write(0x06, self.type_command)  # cursor dir
@@ -50,6 +53,19 @@ class LcdDisplay:
         self.cur_col:int = 0
         self.log.debug("LCD display initialized.")
 
+    def _init_mcp23008(self):
+        # Taken from: <https://github.com/adafruit/Adafruit_CircuitPython_MCP230xx/blob/main/adafruit_mcp230xx/mcp23008.py>
+        if self.ada is True:
+            self._dev_write(0x00)  # IODIR function call
+            self._dev_write(0xff)  # Reset to all inputs
+            time.sleep(self.delay)
+            self._dev_write(0x06)  # GGPU function call
+            self._dev_write(0x00)  # All pull-ups off
+            time.sleep(self.delay)
+            self._dev_write(0x01)  # IPOL function call
+            self._dev_write(0x00)  # No inverse polarity
+            time.sleep(self.delay)
+            
     def set_backlight(self, state:bool):
         if self.active is False:
             return
@@ -58,6 +74,11 @@ class LcdDisplay:
         else:
             self.backlight = 0x00
 
+    def _dev_write(self, byte:int):
+        if self.ada is True:
+            self.bus.write_byte(self.i2c_addr, 0x09)  # MCP33008 GPIO function    # pyright:ignore[reportUnknownMemberType]
+        self.bus.write_byte(self.i2c_addr, byte)  # pyright:ignore[reportUnknownMemberType]
+        
     def write(self, byte:int, data_type:int):
         if self.active is False:
             return
@@ -72,31 +93,19 @@ class LcdDisplay:
             lo_byte = data_type | ((byte << 4) & 0xF0) | self.backlight
 
         time.sleep(self.start_byte_delay)
-        if self.ada is True:
-            self.bus.write_byte(self.i2c_addr, 0x09)  # MCP33008 GPIO function    # pyright:ignore[reportUnknownMemberType]
-        self.bus.write_byte(self.i2c_addr, hi_byte)  # pyright:ignore[reportUnknownMemberType]
+        self._dev_write(hi_byte)
         time.sleep(self.delay)
-        if self.ada is True:
-            self.bus.write_byte(self.i2c_addr, 0x09)  # MCP33008 GPIO function  # pyright:ignore[reportUnknownMemberType]
-        self.bus.write_byte(self.i2c_addr, (hi_byte | self.enable))  # pyright:ignore[reportUnknownMemberType]
+        self._dev_write(hi_byte | self.enable)
         time.sleep(self.delay)
-        if self.ada is True:
-            self.bus.write_byte(self.i2c_addr, 0x09)  # MCP33008 GPIO function  # pyright:ignore[reportUnknownMemberType]
-        self.bus.write_byte(self.i2c_addr, (hi_byte & ~self.enable))  # pyright:ignore[reportUnknownMemberType]
+        self._dev_write(hi_byte & ~self.enable)
         time.sleep(self.delay)
 
         time.sleep(self.start_byte_delay)
-        if self.ada is True:
-            self.bus.write_byte(self.i2c_addr, 0x09)  # MCP33008 GPIO function    # pyright:ignore[reportUnknownMemberType]
-        self.bus.write_byte(self.i2c_addr, lo_byte)  # pyright:ignore[reportUnknownMemberType]
+        self._dev_write(lo_byte)
         time.sleep(self.delay)
-        if self.ada is True:
-            self.bus.write_byte(self.i2c_addr, 0x09)  # MCP33008 GPIO function    # pyright:ignore[reportUnknownMemberType]
-        self.bus.write_byte(self.i2c_addr, (lo_byte | self.enable))  # pyright:ignore[reportUnknownMemberType]
+        self._dev_write(lo_byte | self.enable)
         time.sleep(self.delay)
-        if self.ada is True:
-            self.bus.write_byte(self.i2c_addr, 0x09)  # MCP33008 GPIO function    # pyright:ignore[reportUnknownMemberType]
-        self.bus.write_byte(self.i2c_addr, (lo_byte & ~self.enable))  # pyright:ignore[reportUnknownMemberType]
+        self._dev_write(lo_byte & ~self.enable)
         time.sleep(self.delay)
 
     def write_row(self, row:int):
@@ -170,8 +179,8 @@ if __name__ == "__main__":
     adafruit_hw:bool = False
     lcd = LcdDisplay(1, i2c_addr, 20, 4, ada=adafruit_hw)
     if lcd.active is True:
-        if adafruit_hw is True:
-            print("Display (Ada) is active, outputting a test-text to the display...")
+        if adafruit_hw is True:  #pyright:ignore[reportUnnecessaryComparison]
+            print("Display (Ada) is active, outputting a test-text to the display...")  #pyright:ignore[reportUnreachable]
         else:
             print("Display is active, outputting a test-text to the display...")
         lcd.print(
