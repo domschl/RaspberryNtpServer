@@ -5,7 +5,18 @@ import copy
 
 
 class LcdDisplay:
+    """ Support for LCD displays using HD44780 display chips using
+        I2C via either PCF8574 or MCP23008 (Adafruit way) I2C to GPIO converters
+    """
     def __init__(self, sm_bus:int=1, i2c_addr:int=0x27, cols:int=20, rows:int=4, ada:bool=False):
+        """
+        smbus:int: should be `1` for all Raspbery PI (with exception of Raspberry 1)
+        i2c_addr:int: default is 0x27 (used with most hardware), Adafruit uses 0x20 if no bridges soldered
+        cols:int: currently always 20
+        rows:int: currently always 4
+        ada:bool: default False, use PCF8574 chip and pin-layout
+                          True: use Adafruit MCP23008 and their specific pin-layout (UNTESTED!)
+        """
         self.log: logging.Logger = logging.getLogger("LcdDisplay")
         self.ada: bool = ada
         try:
@@ -64,6 +75,7 @@ class LcdDisplay:
             time.sleep(self.delay)
             
     def set_backlight(self, state:bool):
+        """ Set backlight on/off """
         if self.active is False:
             return
         if state is True:
@@ -78,6 +90,7 @@ class LcdDisplay:
             self.bus.write_byte(self.i2c_addr, byte)  # pyright:ignore[reportUnknownMemberType]
         
     def write(self, byte:int, data_type:int):
+        """ write to Display chip using an I2C to GPIO converter """
         if self.active is False:
             return
 
@@ -107,6 +120,7 @@ class LcdDisplay:
         time.sleep(self.delay)
 
     def write_row(self, row:int):
+        """ Write complete row from buffer """
         if self.active is False:
             return
         ra = self.line_cmds[row]
@@ -115,6 +129,7 @@ class LcdDisplay:
             self.write(ord(self.screen_buf[row][i]), self.type_data)
 
     def print_row(self, row:int, text:str):
+        """ Print row to buffer and display """
         if self.active is False:
             return
         if row < 0:
@@ -126,6 +141,7 @@ class LcdDisplay:
         self.write_row(row)
 
     def print_at(self, row:int, col:int, text:str):
+        """ Print to buffer and display at given coordinates """
         if self.active is False:
             return
         if row < 0 or row > self.rows - 1:
@@ -138,6 +154,7 @@ class LcdDisplay:
         self.write_row(row)
 
     def scroll(self, n:int=1):
+        """ Scroll screen a number of lines """
         if self.active is False:
             return
         for _ in range(n):
@@ -151,6 +168,7 @@ class LcdDisplay:
             self.cur_row = self.cur_row - 1
 
     def print(self, text:str):
+        """ Print longer text, scroll if necessary """
         if self.active is False:
             return
         if len(text) + self.cur_col > self.cols:
@@ -173,8 +191,11 @@ class LcdDisplay:
 
 
 if __name__ == "__main__":
-    i2c_addr:int = 0x27
-    adafruit_hw:bool = False
+    """ Stand-alone test routines for the display
+        Adapt i2c_addr and adafruit_hw below
+    """
+    i2c_addr:int = 0x27  # I2C address, adapt to your board (usual values are 0x20 .. 0x27)
+    adafruit_hw:bool = False  # Set to True for Adafruit MCP23008 based I2C converter, False for all others (PCF8574 converter)
     lcd = LcdDisplay(1, i2c_addr, 20, 4, ada=adafruit_hw)
     if lcd.active is True:
         if adafruit_hw is True:  #pyright:ignore[reportUnnecessaryComparison]
