@@ -49,8 +49,10 @@ class LcdDisplay:
         self.set_backlight(True)
 
         if self.ada is True:
+            # If MCP23008 chip is used, initialize it. (PCF8574 doesn't need init)
             self._init_mcp23008()
-            
+
+        # Initialize the display chip HD44780
         self.write(0x33, self.type_command)  # init sequence: 0x03, 0x03
         self.write(0x32, self.type_command)  # init seq cont: 0x03, 0x02
         self.write(0x06, self.type_command)  # cursor dir
@@ -59,9 +61,11 @@ class LcdDisplay:
         self.write(0x01, self.type_command)  # clear (slow!)
         time.sleep(self.cls_delay)
 
+        # Initialize the display buffer
         self.screen_buf:list[list[str]] = [[" " for _ in range(cols)] for _ in range(rows)]
         self.cur_row:int = 0
         self.cur_col:int = 0
+        
         self.log.debug("LCD display initialized.")
 
     def _init_mcp23008(self):
@@ -85,8 +89,10 @@ class LcdDisplay:
 
     def _dev_write(self, byte:int):
         if self.ada is True:
+            # Do a register-write for MCP23008, using GPIO function 0x09
             self.bus.write_byte_data(self.i2c_addr, 0x09, byte)  # MCP23008 GPIO function    # pyright:ignore[reportUnknownMemberType]
         else:
+            # Just write content for PCF8574
             self.bus.write_byte(self.i2c_addr, byte)  # pyright:ignore[reportUnknownMemberType]
         
     def write(self, byte:int, data_type:int):
@@ -95,6 +101,7 @@ class LcdDisplay:
             return
 
         if self.ada is True:
+            # 'cabling' between display chip and i2c convert is different for adafruit!
             backlight = self.backlight << 4
             data_type = data_type << 1
             hi_byte = data_type | ((byte & 0xF0) >> 1) | backlight
@@ -194,8 +201,13 @@ if __name__ == "__main__":
     """ Stand-alone test routines for the display
         Adapt i2c_addr and adafruit_hw below
     """
-    i2c_addr:int = 0x27  # I2C address, adapt to your board (usual values are 0x20 .. 0x27)
-    adafruit_hw:bool = False  # Set to True for Adafruit MCP23008 based I2C converter, False for all others (PCF8574 converter)
+
+    # Adapt:
+    i2c_addr:int = 0x27         # I2C address, adapt to your board (usual values are 0x20 .. 0x27)
+    adafruit_hw:bool = False    # Set to True for Adafruit MCP23008 based I2C converter, False for all others (PCF8574 converter)
+
+    # Start test:
+    logging.basicConfig(level=logging.DEBUG)
     lcd = LcdDisplay(1, i2c_addr, 20, 4, ada=adafruit_hw)
     if lcd.active is True:
         if adafruit_hw is True:  #pyright:ignore[reportUnnecessaryComparison]
