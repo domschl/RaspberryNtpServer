@@ -329,11 +329,10 @@ Depending on you distri and chrony versione, the config is either `/etc/chrony/c
 
 ```
 refclock PPS /dev/pps0 lock GPS
-refclock SHM 0 refid GPS precision 1e-1 offset 0.01 delay 0.2 noselect
+refclock SHM 0 refid GPS precision 1e-1 offset 0.0 delay 0.2 noselect
 ```
 
 > **Note:** See [man chrony.conf](https://chrony-project.org/doc/4.4/chrony.conf.html) for more details
-> **Note:** For recent `chrony` versions, an offset of `0.0` seems to prevent GPS sync, hence set it to `offset 0.01` (or any small, non-zero value) for start. See below, how to get the actual correct `offset` value.
 
 This uses a shared memory device `SHM` to get unprecise time information from GPSD (low precision, marked as `noselect`, so that chrony doesn't try to sync to serial time data). This unprecise time information is then synchronised with the much more precise PPS signal.
 
