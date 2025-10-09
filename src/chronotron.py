@@ -9,8 +9,19 @@ import threading
 from typing import Any, cast
 
 from i2c_lcd import LcdDisplay
-
 # from button import Button
+
+#------- CONFIGURATION PARAMETERS -----------------------
+# start_time and end_time switch the display off during night-time.
+# Set both to None for always-on
+start_time:str|None = "07:00"
+end_time:str|None = "21:00"
+# I2C address of the display, usually between 0x20 (Adafruit default) and 0x27 (all others)
+i2c_address_display:int = 0x27
+# Set to True for Adafruit I2C adapter which uses MCP23008 chip. Enables Adafruit specific connections
+# Set to False for all others which use PCF8574 
+adafruit_i2c_hardware:bool = False
+# ---------------------------------------------------------
 
 # Global Variables for GPS data from background thread
 gps_lock: threading.Lock = threading.Lock()
@@ -127,12 +138,14 @@ def main_loop():
     old_pps = False
     old_stratum = None
     old_src = None
+    global start_time
+    global end_time
+    global i2c_address_display
+    global adafruit_i2c_hardware
 
     version = "2.0.0"
 
     # Time interval for backlight, set to None for permanent backlight:
-    start_time:str|None = "07:00"
-    end_time:str|None = "21:00"
 
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger("Chronotron")
@@ -155,7 +168,8 @@ def main_loop():
 
     # bt = Button([(27, "blue", select_button), (22, "black", main_button)])
 
-    lcd = LcdDisplay(sm_bus=1, i2c_addr=0x27, cols=20, rows=4)
+    # See beginning of file for configuration of i2c parameters
+    lcd = LcdDisplay(sm_bus=1, i2c_addr=i2c_address_display, cols=20, rows=4, ada=adafruit_i2c_hardware)
     if lcd.active is False:
         log.error("Failed to open display, exiting...")
         exit(-1)
@@ -164,10 +178,10 @@ def main_loop():
         time_str = time.strftime("%Y-%m-%d  %H:%M:%S")
         if time_str != last_time:
             if (
-                start_time is None  # pyright:ignore[reportUnnecessaryComparison]
-                or end_time is None  # pyright:ignore[reportUnnecessaryComparison]
+                start_time is None
+                or end_time is None
                 or is_current_time_in_interval(start_time, end_time)
-                or start_time == end_time  # pyright:ignore[reportUnnecessaryComparison]
+                or start_time == end_time
             ):
                 lcd.set_backlight(True)
             else:

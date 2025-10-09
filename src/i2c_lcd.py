@@ -15,7 +15,7 @@ class LcdDisplay:
         cols:int: currently always 20
         rows:int: currently always 4
         ada:bool: default False, use PCF8574 chip and pin-layout
-                          True: use Adafruit MCP23008 and their specific pin-layout (UNTESTED!)
+                          True: use Adafruit MCP23008 and their specific pin-layout
         """
         self.log: logging.Logger = logging.getLogger("LcdDisplay")
         self.ada: bool = ada
