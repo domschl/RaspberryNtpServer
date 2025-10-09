@@ -71,7 +71,7 @@ class LcdDisplay:
     def _init_mcp23008(self):
         # Taken from: <https://github.com/adafruit/Adafruit_CircuitPython_MCP230xx/blob/main/adafruit_mcp230xx/mcp23008.py>
         if self.ada is True:
-            self.bus.write_byte_data(self.i2c_addr, 0x00, 0xff)  # IODIR, reset all to input  # pyright:ignore[reportUnknownMemberType]
+            self.bus.write_byte_data(self.i2c_addr, 0x00, 0x00)  # IODIR, reset all to OUTPUT  # pyright:ignore[reportUnknownMemberType]
             time.sleep(self.delay)
             self.bus.write_byte_data(self.i2c_addr, 0x06, 0x00)  # GGPU, all pull-ups off  # pyright:ignore[reportUnknownMemberType]
             time.sleep(self.delay)
