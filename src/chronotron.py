@@ -34,14 +34,22 @@ gps_mode: int|None = None
 gps_sats_used: int|None = None
 gps_sats: int|None = None
 
-def is_current_time_in_interval(start_time_str:str|None, end_time_str:str|None):
-    if start_time_str is None or end_time_str is None:
+bad_time_format_warning:bool = False
+def is_current_time_in_interval(log:logging.Logger, start_time_str:str|None, end_time_str:str|None):
+    global bad_time_format_warning
+    if start_time_str is None or end_time_str is None or start_time_str == "None" or end_time_str == "None":
         return True
     # Get the current local time
     current_time = datetime.now().time()
     # Parse start and end times from strings
-    start_time = datetime.strptime(start_time_str, "%H:%M").time()
-    end_time = datetime.strptime(end_time_str, "%H:%M").time()
+    try:
+        start_time = datetime.strptime(start_time_str, "%H:%M").time()
+        end_time = datetime.strptime(end_time_str, "%H:%M").time()
+    except Exception as e:
+        if bad_time_format_warning is False:
+            bad_time_format_warning = True
+            log.error(f"Invalid start_time {start_time_str} or end_time {start_time_str}, ignoring restrictions: {e}")
+        return True
     # Check if the interval spans across midnight
     if start_time > end_time:
         return current_time >= start_time or current_time < end_time
@@ -192,7 +200,7 @@ def main_loop():
             if (
                 start_time is None
                 or end_time is None
-                or is_current_time_in_interval(start_time, end_time)
+                or is_current_time_in_interval(log, start_time, end_time)
                 or start_time == end_time
             ):
                 lcd.set_backlight(True)
