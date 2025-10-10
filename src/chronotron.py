@@ -21,6 +21,11 @@ i2c_address_display:int = 0x27
 # Set to True for Adafruit I2C adapter which uses MCP23008 chip. Enables Adafruit specific connections
 # Set to False for all others which use PCF8574 
 adafruit_i2c_hardware:bool = False
+# Display time as UTC
+display_utc_time:bool = False
+# LCD display update timing: False: default, slow according to spec,
+# True: update faster, low latency, exceeds specs
+lcd_latency_overdrive:bool = False
 # ---------------------------------------------------------
 
 # Global Variables for GPS data from background thread
@@ -142,6 +147,8 @@ def main_loop():
     global end_time
     global i2c_address_display
     global adafruit_i2c_hardware
+    global display_utc_time
+    global lcd_latency_overdrive
 
     version = "2.0.0"
 
@@ -169,13 +176,16 @@ def main_loop():
     # bt = Button([(27, "blue", select_button), (22, "black", main_button)])
 
     # See beginning of file for configuration of i2c parameters
-    lcd = LcdDisplay(sm_bus=1, i2c_addr=i2c_address_display, cols=20, rows=4, ada=adafruit_i2c_hardware)
+    lcd = LcdDisplay(sm_bus=1, i2c_addr=i2c_address_display, cols=20, rows=4, ada=adafruit_i2c_hardware, fast_lcd=lcd_latency_overdrive)
     if lcd.active is False:
         log.error("Failed to open display, exiting...")
         exit(-1)
 
     while True:
-        time_str = time.strftime("%Y-%m-%d  %H:%M:%S")
+        if display_utc_time is True:
+            time_str: str = time.strftime("%Y-%m-%d  %H:%M:%S", time.gmtime())
+        else:
+            time_str = time.strftime("%Y-%m-%d  %H:%M:%S")
         if time_str != last_time:
             if (
                 start_time is None

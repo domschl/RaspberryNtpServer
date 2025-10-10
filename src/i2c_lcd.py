@@ -8,7 +8,7 @@ class LcdDisplay:
     """ Support for LCD displays using HD44780 display chips using
         I2C via either PCF8574 or MCP23008 (Adafruit way) I2C to GPIO converters
     """
-    def __init__(self, sm_bus:int=1, i2c_addr:int=0x27, cols:int=20, rows:int=4, ada:bool=False):
+    def __init__(self, sm_bus:int=1, i2c_addr:int=0x27, cols:int=20, rows:int=4, ada:bool=False, fast_lcd:bool=False):
         """
         smbus:int: should be `1` for all Raspbery PI (with exception of Raspberry 1)
         i2c_addr:int: default is 0x27 (used with most hardware), Adafruit uses 0x20 if no bridges soldered
@@ -19,6 +19,7 @@ class LcdDisplay:
         """
         self.log: logging.Logger = logging.getLogger("LcdDisplay")
         self.ada: bool = ada
+        self.fast_lcd:bool = fast_lcd
         try:
             self.bus:smbus.SMBus = smbus.SMBus(sm_bus)  # Rev 1 Pi: 0, Rev 2 Pi: 1  # pyright:ignore[reportUnknownMemberType]
             self.active:bool = True
@@ -40,9 +41,16 @@ class LcdDisplay:
         self.rows:int = rows
         self.line_cmds:list[int] = [0x80, 0xC0, 0x94, 0xD4]  # lines 1-4
 
-        self.start_byte_delay:float = 0.001
-        self.delay:float = 0.00001
-        self.cls_delay:float = 0.003
+        # Communication timing for LCD display
+        if fast_lcd is True:
+            self.start_byte_delay:float = 0.0
+            self.delay:float = 0.000001
+            self.cls_delay:float = 0.0008
+        else:
+            self.start_byte_delay = 0.001
+            self.delay = 0.00001
+            self.cls_delay = 0.003
+        
         self.type_data:int = 1
         self.type_command:int = 0
         self.enable:int = 0x04
@@ -215,10 +223,11 @@ if __name__ == "__main__":
             print("Display (Ada) is active, outputting a test-text to the display...")  #pyright:ignore[reportUnreachable]
         else:
             print("Display is active, outputting a test-text to the display...")
-        lcd.print(
-            "Hello! That is a hell of a lot of text that we are going to display on this tiny screen. However there is always a way to present information in a way that is helpful, even under contrained conditions."
-        )
-        print("Done")
+        test_text:str = "Hello! That is a hell of a lot of text that we are going to display on this tiny screen. However there is always a way to present information in a way that is helpful, even under contrained conditions."
+        start_time = time.time()
+        lcd.print(test_text)
+        dtc:float = time.time()/start_time/len(test_text)        
+        print(f"Done, display speed per character: {dtc:1.8f} sec")
         exit(0)
     else:
         print("Failed to initialize display")

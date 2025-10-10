@@ -74,6 +74,11 @@ i2c_address_display:int = 0x27
 # Set to True for Adafruit I2C adapter which uses MCP23008 chip. Enables Adafruit specific connections
 # Set to False for all others which use PCF8574 
 adafruit_i2c_hardware:bool = False
+# Display time as UTC
+display_utc_time:bool = False
+# LCD display update timing: False: default, slow according to spec,
+# True: update faster, low latency, exceeds specs
+lcd_latency_overdrive:bool = False
 # ---------------------------------------------------------
 ```
 
@@ -90,6 +95,14 @@ start_time:str|None = None
 end_time:str|None = None
 
 Otherwise adapt the times to your liking, using 24h times and format "HH:MM"
+
+If you want to display the time as UTC, set
+# Display time as UTC
+display_utc_time:bool = True
+
+You can try to reduce LCD display latency by setting:
+lcd_latency_overdrive:bool = True
+
 
 2. Copy the python files to `/opt/chronotron`:
 
