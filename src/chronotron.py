@@ -34,7 +34,9 @@ gps_mode: int|None = None
 gps_sats_used: int|None = None
 gps_sats: int|None = None
 
-def is_current_time_in_interval(start_time_str:str, end_time_str:str):
+def is_current_time_in_interval(start_time_str:str|None, end_time_str:str|None):
+    if start_time_str is None or end_time_str is None:
+        return True
     # Get the current local time
     current_time = datetime.now().time()
     # Parse start and end times from strings
