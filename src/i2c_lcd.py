@@ -42,7 +42,7 @@ class LcdDisplay:
         self.line_cmds:list[int] = [0x80, 0xC0, 0x94, 0xD4]  # lines 1-4
 
         # Communication timing for LCD display
-        if fast_lcd is True:
+        if self.fast_lcd is True:
             self.start_byte_delay:float = 0.0
             self.delay:float = 0.000001
             self.cls_delay:float = 0.0008
@@ -214,10 +214,11 @@ if __name__ == "__main__":
     # Adapt:
     i2c_addr:int = 0x27         # I2C address, adapt to your board (usual values are 0x20 .. 0x27)
     adafruit_hw:bool = False    # Set to True for Adafruit MCP23008 based I2C converter, False for all others (PCF8574 converter)
-
+    fast_lcd:bool = True        # True: Exceed documented timings for LCD for reduced latency
+    
     # Start test:
     logging.basicConfig(level=logging.DEBUG)
-    lcd = LcdDisplay(1, i2c_addr, 20, 4, ada=adafruit_hw)
+    lcd = LcdDisplay(1, i2c_addr, 20, 4, ada=adafruit_hw, fast_lcd=fast_lcd)
     if lcd.active is True:
         if adafruit_hw is True:  #pyright:ignore[reportUnnecessaryComparison]
             print("Display (Ada) is active, outputting a test-text to the display...")  #pyright:ignore[reportUnreachable]
@@ -226,7 +227,7 @@ if __name__ == "__main__":
         test_text:str = "Hello! That is a hell of a lot of text that we are going to display on this tiny screen. However there is always a way to present information in a way that is helpful, even under contrained conditions."
         start_time = time.time()
         lcd.print(test_text)
-        dtc:float = time.time()/start_time/len(test_text)        
+        dtc:float = (time.time()-start_time)/len(test_text)        
         print(f"Done, display speed per character: {dtc:1.8f} sec")
         exit(0)
     else:

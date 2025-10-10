@@ -24,8 +24,8 @@ adafruit_i2c_hardware:bool = False
 # Display time as UTC
 display_utc_time:bool = False
 # LCD display update timing: False: default, slow according to spec,
-# True: update faster, low latency, exceeds specs
-lcd_latency_overdrive:bool = False
+# True: update faster, low latency, exceeds specs. Set to False on display problems!
+lcd_latency_overdrive:bool = True
 # ---------------------------------------------------------
 
 # Global Variables for GPS data from background thread
