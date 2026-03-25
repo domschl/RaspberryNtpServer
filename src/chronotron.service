@@ -2,6 +2,11 @@
 Description=Display chrony statistics on 4x20 LCD
 After=network.target
 
+//If in 1 min fail more then 5 times, stop restart service.
+StartLimitIntervalSec=60s
+StartLimitBurst=5
+
+
 [Service]
 Type=simple
 User=root
@@ -10,6 +15,9 @@ WorkingDirectory=/opt/chronotron
 ExecStart=/opt/chronotron/chronotron.py
 StandardOutput=syslog
 StandardError=syslog
+//If service fail, auto restart after 5 sec
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
